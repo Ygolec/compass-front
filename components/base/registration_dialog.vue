@@ -1,10 +1,13 @@
 <template>
   <v-dialog
       :model-value="dialog"
-      @update:model-value="update_dialog">
+      @update:model-value="update_dialog"
+      max-width="500"
+  >
     <v-card
         class="mx-auto my-auto"
-        min-width="500">
+        min-width="500"
+    >
       <v-form @submit.prevent="handle_submit">
         <v-card-title>Регистрация</v-card-title>
         <v-card-text>

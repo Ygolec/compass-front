@@ -47,17 +47,37 @@
 <script setup lang="ts">
 import {email_check, required} from "~/utils/rules";
 import Registration_dialog from "~/components/base/registration_dialog.vue";
+import {useAuthStore} from "~/stores/auth_store";
 
+const authStore = useAuthStore();
 const email = ref<string>('');
 const password = ref<string>('');
 const loading = ref<boolean>(false);
 const registration_dialog = ref<boolean>(false);
+const error = ref('');
 
-const login = () => {
+const login = async () => {
   loading.value = true;
-  setTimeout(() => {
+
+  const {data} = await useFetch('/api/auth/login', {
+    method: 'POST',
+    body: ({
+      email: email.value,
+      password: password.value
+    })
+  })
+
+  if (data.value?.status === 'success' &&  'token' in data.value) {
+    loading.value=false;
+    authStore.setToken(data.value.token);
+  } else {
     loading.value = false;
-  }, 2000);
+    if (data.value?.status === 'error' && 'message' in data.value) {
+      error.value = data.value.message;
+    } else {
+      error.value = 'Ошибка авторизации';
+    }
+  }
 };
 
 const handle_submit = () => {
