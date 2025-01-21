@@ -1,25 +1,30 @@
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
-  build:{
-    transpile: ['vuetify'],
-  },
-  modules: [
-    (_options, nuxt) => {
-      nuxt.hooks.hook('vite:extendConfig', (config) => {
-        // @ts-expect-error
-        config.plugins.push(vuetify({ autoImport: true }))
-      })
+    runtimeConfig:{
+        HSE_EMAIL: process.env.HSE_EMAIL,
+        HSE_EMAIL_PASSWORD: process.env.HSE_EMAIL_PASSWORD,
+        ENCRYPTION_KEY_FOR_HSE_TOKEN: process.env.ENCRYPTION_KEY_FOR_HSE_TOKEN,
+        DATABASE_URL: process.env.DATABASE_URL
     },
-    //...
-  ],
-  vite: {
-    vue: {
-      template: {
-        transformAssetUrls,
-      },
+    compatibilityDate: '2024-04-03',
+    build: {
+        transpile: ['vuetify'],
     },
-  },
-  devtools: { enabled: true }
-})
+    modules: [
+        '@pinia/nuxt',
+        // другие модули...
+    ],
+    vite: {
+        vue: {
+            template: {
+                transformAssetUrls,
+            },
+        },
+        plugins: [
+            vuetify({ autoImport: true })
+        ]
+    },
+    devtools: { enabled: true }
+});
