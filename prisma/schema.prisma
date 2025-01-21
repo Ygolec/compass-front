@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model is_active_token_for_search {
+  id         Int      @id(map: "is_active_token_for_search_pk") @default(autoincrement())
+  is_active  Boolean
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+}
+
+model token_for_search {
+  id         Int      @id(map: "id") @default(autoincrement())
+  token      String
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+}
