@@ -17,8 +17,8 @@ function decryptString(encryptedString: string, secretKey: string): string {
 }
 
 async function updateToken() {
-    const updateResponse: { success?: boolean; error?: string } = await fetch('/api/hse_api/update_token').then(res => res.json());
-    if (!updateResponse?.success) {
+    const updateResponse = await $fetch('/api/hse_api/update_token');
+    if (!updateResponse || !('success' in updateResponse)) {
         throw new Error('Ошибка обновления токена');
     }
 }
