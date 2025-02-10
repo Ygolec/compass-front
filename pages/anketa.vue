@@ -1,10 +1,13 @@
+<template>
+<anketa_dialogue/>
+</template>
+
 <script setup lang="ts">
 
-</script>
+import Anketa_dialogue from "~/components/anketa/anketa_dialogue.vue";
 
-<template>
-  $END$
-</template>
+
+</script>
 
 <style scoped>
 

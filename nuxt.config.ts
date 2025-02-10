@@ -6,7 +6,9 @@ export default defineNuxtConfig({
         HSE_EMAIL: process.env.HSE_EMAIL,
         HSE_EMAIL_PASSWORD: process.env.HSE_EMAIL_PASSWORD,
         ENCRYPTION_KEY_FOR_HSE_TOKEN: process.env.ENCRYPTION_KEY_FOR_HSE_TOKEN,
-        DATABASE_URL: process.env.DATABASE_URL
+        DATABASE_URL: process.env.DATABASE_URL,
+        DIRECTUS_URL: process.env.DIRECTUS_URL,
+        DIRECTUS_TOKEN: process.env.DIRECTUS_TOKEN
     },
     compatibilityDate: '2024-04-03',
     build: {
