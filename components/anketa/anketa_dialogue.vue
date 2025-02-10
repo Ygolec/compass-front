@@ -4,94 +4,198 @@
       Заполнение анкеты для пользователя
     </v-card-title>
     <v-card-text>
-      <v-text-field v-model="anketa_data.fullName" label="ФИО" :rules="[required]" required></v-text-field>
-      <v-text-field v-model="anketa_data.birthDate" label="Дата рождения" type="date" :rules="[required]" required></v-text-field>
-      <v-text-field v-model="anketa_data.faculty" label="Факультет" :rules="[required]" required></v-text-field>
-      <v-text-field v-model="anketa_data.course" label="Курс" type="number" :rules="[required, isNumber]" required></v-text-field>
-      <v-text-field v-model="anketa_data.city" label="Город проживания" :rules="[required]" required></v-text-field>
-      <v-radio-group v-model="anketa_data.sex" label="Пол" :rules="[required]" required>
+      <v-row>
+        <v-col cols="4">
+          <v-text-field v-model="anketa_data.lastName" label="Фамилия" :rules="[required]"></v-text-field>
+        </v-col>
+        <v-col cols="4">
+          <v-text-field v-model="anketa_data.firstName" label="Имя" :rules="[required]"></v-text-field>
+        </v-col>
+        <v-col cols="4">
+          <v-text-field v-model="anketa_data.middleName" label="Отчество"></v-text-field>
+        </v-col>
+      </v-row>
+
+      <v-text-field v-model="anketa_data.birthDate" label="Дата рождения" type="date" :rules="[required]"></v-text-field>
+
+      <v-text-field v-model="anketa_data.facultyFullName" label="Полное название факультета" :rules="[required]"></v-text-field>
+
+      <v-text-field v-model="anketa_data.facultyShortName" label="Короткое название факультета" :rules="[required]"></v-text-field>
+
+      <v-select
+          v-model="anketa_data.course"
+          label="Курс"
+          :items="[1, 2, 3, 4, 5, 'М1', 'М2']"
+          :rules="[required]"
+      ></v-select>
+
+      <v-text-field v-model="anketa_data.city" label="Город проживания" :rules="[required]"></v-text-field>
+
+      <v-radio-group v-model="anketa_data.sex" label="Пол" :rules="[required]">
         <v-radio label="Мужской" value="male"></v-radio>
         <v-radio label="Женский" value="female"></v-radio>
       </v-radio-group>
-      <v-select v-model="anketa_data.roomType" label="Предпочтительный тип комнаты"
-                :items="['Одноместная', 'Двухместная', 'Трехместная']" :rules="[required]" required></v-select>
-      <v-select v-model="anketa_data.preferredFloor" label="Предпочтительный этаж"
-                :items="[1, 2, 3, 4, 5, 99]"></v-select>
-      <v-select v-model="anketa_data.hasChronicDiseases" label="Наличие хронических заболеваний"
-                :items="[{title:'Да', value: true}, {title:'Нет', value: false}]" :rules="[required]" required></v-select>
-      <v-checkbox v-model="anketa_data.needsBenefitPlacement" label="Нуждается в льготном размещении"></v-checkbox>
-      <v-checkbox v-model="anketa_data.needsSpecialConditions"
-                  label="Нуждается в доступе к специальным условиям (например, пандус, лифт)"></v-checkbox>
-      <v-text-field v-model="anketa_data.phone" label="Контактный телефон" type="tel" :rules="[required, phone_check]" required></v-text-field>
-      <v-text-field v-model="anketa_data.email" label="Электронная почта" type="email" :rules="[required, email_hse_student_check]" required></v-text-field>
-      <v-select v-model="anketa_data.sports" label="Занимаетесь ли вы спортом?"
-                :items="[{title:'Да', value: true}, {title:'Нет', value: false}]" required></v-select>
-      <v-text-field v-model="anketa_data.sportsType" label="Какими видами спорта увлекаетесь?" :rules="[optional]"></v-text-field>
-      <v-select v-model="anketa_data.boardGames" label="Играете ли вы в настольные игры?"
-                :items="[{title:'Да', value: true}, {title:'Нет', value: false}]" required></v-select>
-      <v-text-field v-model="anketa_data.hobbies" label="Есть ли у вас другие хобби?" :rules="[optional]"></v-text-field>
-      <v-text-field v-model="anketa_data.religion" label="Какое у вас вероисповедание?" :rules="[required]" required></v-text-field>
-      <v-select v-model="anketa_data.sameReligionNeighbor" label="Хотели бы вы жить с соседом того же вероисповедания?"
-                :items="[{title:'Да', value: true}, {title:'Нет', value: false}]" required></v-select>
-      <v-text-field v-model="anketa_data.nationality" label="Национальность" :rules="[required]" required></v-text-field>
-      <v-select v-model="anketa_data.russianProficiency" label="Знание русского языка"
-                :items="['Начальный', 'Средний', 'Свободный']" required></v-select>
-      <v-select v-model="anketa_data.englishProficiency" label="Знание английского языка"
-                :items="['Начальный', 'Средний', 'Свободный']" required></v-select>
-      <v-select v-model="anketa_data.roomStyle" label="Квартирный тип или коридорный"
-                :items="['Квартирный', 'Коридорный']" required></v-select>
+
+      <v-select
+          v-model="anketa_data.roomType"
+          label="Предпочтительный тип комнаты"
+          :items="['Одноместная', 'Двухместная', 'Трехместная', 'Четырёхместная']"
+          :rules="[required]"
+      ></v-select>
+
+      <v-text-field
+          v-model="anketa_data.preferredFloor"
+          label="Предпочтительный этаж"
+          type="number"
+          min="1"
+          max="21"
+      ></v-text-field>
+
+      <v-divider class="my-4"></v-divider>
+
+      <v-card outlined class="pa-4">
+        <v-card-title>Дополнительные предпочтения</v-card-title>
+
+        <v-checkbox v-model="anketa_data.hasChronicDiseases" label="Есть хронические заболевания"></v-checkbox>
+        <v-checkbox v-model="anketa_data.needsBenefitPlacement" label="Нуждается в льготном размещении"></v-checkbox>
+        <v-checkbox v-model="anketa_data.needsSpecialConditions" label="Нуждается в специальных условиях"></v-checkbox>
+        <v-checkbox v-model="anketa_data.boardGames" label="Играете в настольные игры?"></v-checkbox>
+
+        <v-checkbox v-model="anketa_data.doSports" label="Занимаетесь спортом?"></v-checkbox>
+        <v-combobox
+            v-if="anketa_data.doSports"
+            v-model="anketa_data.sports"
+            label="Каким спортом занимаетесь?"
+            multiple
+            :items="sportsList"
+        ></v-combobox>
+
+        <v-checkbox v-model="anketa_data.hasHobbies" label="Есть хобби?"></v-checkbox>
+        <v-combobox
+            v-if="anketa_data.hasHobbies"
+            v-model="anketa_data.hobbies"
+            label="Какие у вас хобби?"
+            multiple
+            :items="hobbiesList"
+        ></v-combobox>
+      </v-card>
+
+      <v-divider class="my-4"></v-divider>
+
+      <v-text-field
+          v-model="anketa_data.phone"
+          label="Контактный телефон"
+          type="tel"
+          :rules="[required, phone_check]"
+      ></v-text-field>
+
+      <v-text-field
+          v-model="anketa_data.email"
+          label="Электронная почта"
+          type="email"
+          :rules="[required, email_hse_student_check]"
+      ></v-text-field>
+
+      <v-select
+          v-model="anketa_data.russianProficiency"
+          label="Знание русского языка"
+          :items="['Начальный', 'Средний', 'Свободный']"
+          :rules="[required]"
+      ></v-select>
+
+      <v-select
+          v-model="anketa_data.englishProficiency"
+          label="Знание английского языка"
+          :items="['Начальный', 'Средний', 'Свободный']"
+          :rules="[required]"
+      ></v-select>
+
+      <v-select
+          v-model="anketa_data.roomStyle"
+          label="Квартирный тип или коридорный"
+          :items="['Квартирный', 'Коридорный']"
+          :rules="[required]"
+      ></v-select>
+
+      <v-alert v-if="emailExists" type="error">
+        Этот email уже используется
+      </v-alert>
     </v-card-text>
+
     <v-card-actions>
-      <v-btn color="primary" @click="submitForm">Отправить</v-btn>
+      <v-btn :disabled="!isFormValid" color="primary" @click="submitForm">Отправить</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import {email_hse_student_check, required, password_check, password_confirm} from "~/utils/rules";
+import { ref, computed } from 'vue';
+import { email_hse_student_check, required } from "~/utils/rules";
 
-const anketa_data = ref<anketa_data>({
-  fullName: '',
+const sportsList = ref(["Футбол", "Баскетбол", "Теннис", "Плавание", "Бег", "Волейбол", "Лыжи", "Тренажерный зал"]);
+
+const hobbiesList = ref(["Чтение", "Музыка", "Спорт", "Рисование", "Программирование"]);
+
+const anketa_data = ref({
+  lastName: '',
+  firstName: '',
+  middleName: '',
   birthDate: '',
-  faculty: '',
-  course: 0,
+  facultyFullName: '',
+  facultyShortName: '',
+  course: '',
   city: '',
   sex: '',
   roomType: '',
-  preferredFloor: 0,
+  preferredFloor: null,
   hasChronicDiseases: false,
   needsBenefitPlacement: false,
   needsSpecialConditions: false,
   phone: '',
   email: '',
-  sports: false,
-  sportsType: '',
+  doSports: false,
+  sports: [],
+  hasHobbies: false,
+  hobbies: [],
   boardGames: false,
-  hobbies: '',
-  religion: '',
-  sameReligionNeighbor: false,
-  nationality: '',
   russianProficiency: '',
   englishProficiency: '',
   roomStyle: ''
 });
 
+const emailExists = ref(false);
+
 const phone_check = v => /^\+?\d{10,15}$/.test(v) || 'Неверный формат телефона';
-const isNumber = v => !isNaN(v) || 'Должно быть числом';
-const optional = v => true;
+
+const isFormValid = computed(() => {
+  return anketa_data.value.lastName &&
+      anketa_data.value.firstName &&
+      anketa_data.value.birthDate &&
+      anketa_data.value.facultyFullName &&
+      anketa_data.value.facultyShortName &&
+      anketa_data.value.course &&
+      anketa_data.value.city &&
+      anketa_data.value.sex &&
+      anketa_data.value.roomType &&
+      anketa_data.value.phone &&
+      anketa_data.value.email &&
+      anketa_data.value.russianProficiency &&
+      anketa_data.value.englishProficiency &&
+      anketa_data.value.roomStyle;
+});
 
 const submitForm = async () => {
+  emailExists.value = false;
   try {
     await $fetch('/api/anketa/send_data', {
       method: 'POST',
       body: anketa_data.value,
     });
   } catch (error) {
+    if (error.response?.status === 409) {
+      emailExists.value = true;
+    }
     console.error(error);
   }
 };
 </script>
-
-<style scoped>
-</style>
