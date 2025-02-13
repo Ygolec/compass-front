@@ -62,22 +62,31 @@ const req = (value: any, fieldName: string) => {
 };
 
 export const validateAnketaData = (anketa: anketa_data) => {
-    req(anketa.fullName, "Full Name");
+    req(anketa.lastName, "Last Name");
+    req(anketa.firstName, "First Name");
+
     req(anketa.birthDate, "Birth Date");
-    req(anketa.faculty, "Faculty");
+    req(anketa.facultyFullName, "Faculty (Full)");
+    req(anketa.facultyShortName, "Faculty (Short)");
     isNumber(anketa.course, "Course");
     req(anketa.city, "City");
-    validateSelect(anketa.sex, ["male", "female"], "Sex");
-    validateSelect(anketa.roomType, ["Одноместная", "Двухместная", "Трехместная"], "Room Type");
-    isNumber(anketa.preferredFloor, "Preferred Floor");
-    email_check(anketa.email);
+
     phone_check(anketa.phone);
-    validateSelect(anketa.sports, [true, false], "Sports");
-    validateSelect(anketa.boardGames, [true, false], "Board Games");
-    req(anketa.religion, "Religion");
-    validateSelect(anketa.sameReligionNeighbor, [true, false], "Same Religion Neighbor");
-    req(anketa.nationality, "Nationality");
+    email_check(anketa.email);
+
+    validateSelect(anketa.roomType, ["Одноместная", "Двухместная", "Трехместная", "Четырехместная"], "Room Type");
+    isNumber(anketa.preferredFloor, "Preferred Floor");
+    validateSelect(anketa.roomStyle, ["Квартирный", "Коридорный"], "Room Style");
+
     validateSelect(anketa.russianProficiency, ["Начальный", "Средний", "Свободный"], "Russian Proficiency");
     validateSelect(anketa.englishProficiency, ["Начальный", "Средний", "Свободный"], "English Proficiency");
-    validateSelect(anketa.roomStyle, ["Квартирный", "Коридорный"], "Room Style");
+
+    validateSelect(anketa.needsBenefitPlacement, [true, false], "Needs Benefit Placement");
+    validateSelect(anketa.hasChronicDiseases, [true, false], "Has Chronic Diseases");
+    validateSelect(anketa.boardGames, [true, false], "Board Games");
+
+    if (anketa.doSports) req(anketa.sports, "Sports Type");
+
+    if (anketa.hasHobbies) req(anketa.hobbies, "Hobbies");
 };
+
