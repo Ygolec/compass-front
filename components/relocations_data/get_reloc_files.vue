@@ -1,9 +1,9 @@
 <template>
   <div>
     <!-- Выводим relocations для отладки -->
-    <div v-if="relocations">
-      <pre>{{ relocations }}</pre>
-    </div>
+<!--    <div v-if="relocations">-->
+<!--      <pre>{{ relocations }}</pre>-->
+<!--    </div>-->
 
     <button v-if="relocations && relocations.length" @click="downloadAllDOCX" class="download-all-btn">
       Скачать все DOCX
@@ -41,16 +41,18 @@ export default {
       this.error = null;
       try {
         const response = await axios.post('/api/get_relocations/get_relocation_files');
+        console.log(response);
         this.relocations = response.data.map(item => ({
           from: {
             fullName: `${item.relocation_applications_id_from.user_created.first_name} ${item.relocation_applications_id_from.user_created.last_name}`,
             email: item.relocation_applications_id_from.user_created.email,
-            phone: item.relocation_applications_id_from.user_created.phone_number,
-            telegram: item.relocation_applications_id_from.user_created.telegram,
+            phone: item.relocation_applications_id_from.phone_number,
+            telegram: item.relocation_applications_id_from.telegram,
             accommodationFrom: item.relocation_applications_id_from.student_accommodation_id_from.name,
             addressFrom: this.formatAddress(item.relocation_applications_id_from.student_accommodation_from_address_id),
             apartmentFrom: item.relocation_applications_id_from.apartment_number,
             roomFrom: item.relocation_applications_id_from.room_number,
+            accomodationTo: item.relocation_applications_id_from.student_accommodation_id_to.name
           },
           to: {
             fullName: `${item.relocation_applications_id_to.user_created.first_name} ${item.relocation_applications_id_to.user_created.last_name}`,
@@ -58,9 +60,10 @@ export default {
             phone: item.relocation_applications_id_to.user_created.phone_number,
             telegram: item.relocation_applications_id_to.user_created.telegram,
             accommodationTo: item.relocation_applications_id_to.student_accommodation_id_to.name,
-            addressTo: this.formatAddress(item.relocation_applications_id_to.student_accommodation_to_address_id),
+            addressTo: this.formatAddress(item.relocation_applications_id_from.student_accommodation_to_address_id),
             apartmentTo: item.relocation_applications_id_to.apartment_number,
             roomTo: item.relocation_applications_id_to.room_number,
+            accomodationFrom: item.relocation_applications_id_to.student_accommodation_id_from.name
           },
         }));
       } catch (err) {
@@ -82,9 +85,9 @@ export default {
             properties: {},
             children: [
               new Paragraph({ text: "Заявление на переселение", heading: "Heading1" }),
-              new Paragraph({ text: `Я, ${from.fullName}, прошу переселить меня из общежития "${from.accommodationFrom}", расположенного по адресу ${from.addressFrom}, квартира ${from.apartmentFrom}, комната ${from.roomFrom}, в общежитие "${to.accommodationTo}", расположенное по адресу ${to.addressTo}, квартира ${to.apartmentTo}, комната ${to.roomTo}.`, alignment: "Left" }),
+              new Paragraph({ text: `Я, ${from.fullName}, прошу переселить меня из общежития "${from.accommodationFrom}", расположенного по адресу ${from.addressFrom}, квартира ${from.apartmentFrom}, комната ${from.roomFrom}, в общежитие "${to.accomodationFrom}", расположенное по адресу ${to.addressTo}, квартира ${to.apartmentTo}, комната ${to.roomTo}.`, alignment: "Left" }),
               new Paragraph(" "),
-              new Paragraph({ text: "Данные о переселении:", heading: "Heading2" }),
+              new Paragraph({ text: "Данные о студентах:", heading: "Heading2" }),
               new Paragraph(`ФИО отправителя: ${from.fullName}`),
               new Paragraph(`Почта отправителя: ${from.email}`),
               new Paragraph(`Телефон отправителя: ${from.phone}`),
