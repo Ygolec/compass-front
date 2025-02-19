@@ -38,17 +38,5 @@ jobs:
         run: |
           # Пример на основе Portainer API v2
           # 1. Авторизуемся в Portainer и получаем токен
-          TOKEN=$(curl -s -X POST "$PORTAINER_ENDPOINT/../auth" \
-            -H "Content-Type: application/json" \
-            -d "{\"username\":\"$PORTAINER_USERNAME\",\"password\":\"$PORTAINER_PASSWORD\"}" \
-            | jq -r '.jwt')
+          TOKEN=$(curl -s -X POST "$PORTAINER_ENDPOINT)
           
-          # 2. Ищем идентификатор стека (stackId) или напрямую, если знаете stack ID: /stacks/STACK_ID
-          #   Допустим у вас один стек под названием "myapp" (или находим через API). Для простоты тут же пропущено, что
-          #   вы должны знать stackId, например 5. 
-
-     
-          # 3. Делаем redeploy
-          curl -s -X POST "$PORTAINER_ENDPOINT/redeploy" \
-            -H "Authorization: Bearer $TOKEN" \
-            -H "Content-Type: application/json"
