@@ -38,5 +38,5 @@ jobs:
         run: |
           # Пример на основе Portainer API v2
           # 1. Авторизуемся в Portainer и получаем токен
-          TOKEN=$(curl -s -X POST "$PORTAINER_ENDPOINT)
+          curl -s -X POST "$PORTAINER_ENDPOINT"
           
