@@ -31,12 +31,6 @@ jobs:
 
       # 4. (Опционально) Автоматически вызываем Portainer API для redeploy
       - name: Trigger redeploy in Portainer
-        env:
-          PORTAINER_USERNAME: ${{ secrets.PORTAINER_USERNAME }}
-          PORTAINER_PASSWORD: ${{ secrets.PORTAINER_PASSWORD }}
-          PORTAINER_ENDPOINT: ${{ secrets.PORTAINER_ENDPOINT }}
         run: |
-          # Пример на основе Portainer API v2
-          # 1. Авторизуемся в Portainer и получаем токен
-          curl -s -X POST "$PORTAINER_ENDPOINT"
+          curl -X POST "${{ secrets.PORTAINER_ENDPOINT }}"
           
