@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         // Отправляем запрос на внешний сервер
-        const response = await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/register`, {
+        const response = await $fetch(`${config.AUTH_BACKEND_URL}/api/v1/users/register`, {
             method: 'POST',
             body: JSON.stringify({
                 email: email,
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
 
         throw createError({
             statusCode: 404,
-            message: 'Ошибка подключения к серверу',
+            message: errorMessage,
         })
     }
 

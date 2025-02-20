@@ -10,9 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@directus/sdk": "^19.0.1",
     "@mdi/font": "^7.4.47",
     "@pinia/nuxt": "0.9.0",
     "@prisma/client": "^6.2.1",
+    "@vercel/nft": "^0.29.1",
     "axios": "^1.7.9",
     "axios-cookiejar-support": "^5.0.5",
     "bun": "^1.2.2",
@@ -34,7 +36,6 @@
     "globals": "^15.12.0",
     "prisma": "^6.2.1",
     "sass-embedded": "^1.83.4",
-    "typescript-eslint": "^8.15.0",
     "vite-plugin-vuetify": "^2.0.4",
     "vuetify": "^3.7.4"
   },

@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 
     try {
 
-        const backendResponse = await fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/logout`, {
+        const backendResponse = await fetch(`${config.AUTH_BACKEND_URL}/api/v1/users/logout`, {
             method: 'POST',
             credentials: 'include',
         })

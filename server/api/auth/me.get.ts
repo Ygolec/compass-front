@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         // Запрос к внешнему API для получения информации о пользователе
-        const response = await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/me`, {
+        const response = await $fetch(`${config.AUTH_BACKEND_URL}/api/v1/users/me`, {
             method: 'GET',
             credentials: 'include',
             headers: getRequestHeaders(event),

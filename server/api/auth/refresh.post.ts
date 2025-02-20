@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         // Отправляем запрос на обновление токена к внешнему бэкенду
-        const response = await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/refresh`, {
+        const response = await $fetch(`${config.AUTH_BACKEND_URL}/api/v1/users/refresh`, {
             method: 'POST',
             credentials: 'include',
             headers: getRequestHeaders(event),
