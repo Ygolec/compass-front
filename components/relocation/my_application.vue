@@ -20,7 +20,7 @@
           <v-carousel>
             <v-carousel-item
             v-for="image in student_relocation_application.photos_of_room"
-            :src="`http://thekevindit.zapto.org:8055/assets/${image}`"
+            :src="`https://directus.hse-compass.ru/assets/${image}`"
             >
             </v-carousel-item>
           </v-carousel>
