@@ -65,7 +65,7 @@
               </v-btn>
             </template>
             <v-list>
-              <v-list-item @click="">
+              <v-list-item @click="watch_details_about_application(item.relocation_applications_id_from.id)">
                 Просмотр заявки
               </v-list-item>
               <v-list-item @click="accept_application_match(item.id)">
@@ -77,10 +77,30 @@
       </v-data-table-server>
     </v-card-text>
   </v-card>
+  <snackbar @update:snackbar="snackbar = $event" :snackbar="snackbar" :details="snackbar_details"/>
+  <application_detail_dialog_by_id :dialog="dialog_detail" @update:dialog="dialog_detail = $event"
+                      :student_relocation_applications_id="dialog_student_relocation_applications_id"/>
 </template>
 <script setup lang="ts">
 import {useAuthStore} from "~/stores/auth_store";
+import Snackbar from "~/components/base/snackbar.vue";
+import Application_detail_dialog_by_id from "~/components/relocation/application_detail_dialog_by_id.vue";
 
+const dialog_detail= ref(false)
+const dialog_student_relocation_applications_id = ref(0)
+
+const snackbar_details = ref<{
+  text: string,
+  color: string,
+  timeout: number,
+  button_close_color: string
+}>({
+  text: '',
+  color: '',
+  timeout: 5000,
+  button_close_color: 'green'
+});
+const snackbar = ref(false)
 const authStore = useAuthStore();
 const student_relocation_applications_match = ref()
 const route = useRoute()
@@ -146,9 +166,23 @@ async function accept_application_match(id: number) {
       body: {student_relocation_applications_match_id: id, relocation_id: route.params.id},
     });
     await load_applications({page: page, itemsPerPage: itemsPerPage, sortBy: sortBy})
-  } catch (error) {
+  } catch (error:any) {
+    if (error.response?._data?.message === "Your application is closed") {
+      snackbar_details.value = {
+        text: 'Ваша заявка на переселение уже закрыта',
+        timeout: 5000,
+        color: 'yellow',
+        button_close_color: 'red'
+      }
+      snackbar.value = true
+    }
     console.error(error)
   }
+}
+
+function watch_details_about_application(application_id: number) {
+  dialog_student_relocation_applications_id.value = application_id
+  dialog_detail.value = true
 }
 </script>
 <style scoped>

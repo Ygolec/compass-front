@@ -61,6 +61,7 @@
 <script setup lang="ts">
 import {useAuthStore} from "~/stores/auth_store";
 import Application_detail from "~/components/relocation/application_detail.vue";
+import Snackbar from "~/components/base/snackbar.vue";
 
 const dialog_detail = ref(false)
 const dialog_student_relocation_applications_id = ref(0)
@@ -88,7 +89,7 @@ async function load_applications({page, itemsPerPage, sortBy}) {
       method: 'POST',
       body: {relocation_id: route.params.id, page, itemsPerPage, sortBy},
     });
-  } catch (error) {
+  } catch (error:any) {
     console.error(error)
   } finally {
     loading.value = false
@@ -117,12 +118,6 @@ const get_status = (status: string) => {
   }
 }
 
-async function test() {
-  await $fetch(`/api/student_relocation_applications_match/create_match`, {
-    method: 'POST',
-    body: {relocation_applications_id_from: 14, relocation_applications_id_to: 15},
-  });
-}
 
 </script>
 <style scoped>

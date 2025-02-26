@@ -145,60 +145,21 @@
         >
           Закрыть
         </v-btn>
-        <v-btn
-            variant="flat"
-            color="green"
-            @click="confirm_dialog = true"
-            :loading="confirm_loading"
-        >
-          Предложить переселение
-        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <confirm_dialog
-      :dialog="confirm_dialog"
-      @update:dialog="confirm_dialog = $event"
-      :details="details_confirm"
-      @confirm="sent_application"
-  />
-  <snackbar @update:snackbar="snackbar = $event" :snackbar="snackbar" :details="snackbar_details"/>
 </template>
 <script setup lang="ts">
-import Confirm_dialog from "~/components/base/confirm_dialog.vue";
-import Snackbar from "~/components/base/snackbar.vue";
-
-const snackbar_details = ref<{
-  text: string,
-  color: string,
-  timeout: number,
-  button_close_color: string
-}>({
-  text: '',
-  color: '',
-  timeout: 5000,
-  button_close_color: 'green'
-});
-const snackbar = ref(false)
-const confirm_dialog = ref(false)
 const props = defineProps({
   dialog: Boolean,
   student_relocation_applications_id: Number,
 });
 const emit = defineEmits(["update:dialog"]);
 const student_relocation_application = ref<student_relocation_application_details>()
-const details_confirm = ref({
-  title: 'Предложить переселение',
-  text: `Вы уверены что хотите предложить переселение?`,
-  button_confirm_text: 'Предложить',
-  button_confirm_color: 'green'
-})
-const confirm_loading = ref(false)
 
 const update_dialog = (value: boolean) => {
   emit('update:dialog', value);
 };
-
 const get_address = (address: student_accommodation_addresses) => {
   const parts = [
     address.city,
@@ -208,45 +169,17 @@ const get_address = (address: student_accommodation_addresses) => {
   ].filter(Boolean);
   return parts.join(',');
 }
-
 watch(() => props.dialog, (value) => {
   if (value) {
     fetchData()
   }
 });
-
-async function sent_application(){
-  confirm_loading.value = true
-  try {
-    await $fetch(`/api/student_relocation_applications_match/create_match`, {
-      method: 'POST',
-      body: student_relocation_application.value
-    });
-  } catch (error: any) {
-    if (error.response?._data?.message === "User already have application") {
-      snackbar_details.value = {
-        text: 'Вы уже отправили заявку, отмените её, чтобы создать новую',
-        timeout: 5000,
-        color: 'red',
-        button_close_color: 'black'
-      }
-      snackbar.value = true
-    }
-    console.error(error)
-  } finally {
-    confirm_loading.value = false
-    update_dialog(false)
-  }
-}
-
 const fetchData = async () => {
   try {
     student_relocation_application.value = await $fetch(`/api/student_relocation_applications/${props.student_relocation_applications_id}`);
   } catch (error: any) {
   }
 };
-
-
 </script>
 <style scoped>
 

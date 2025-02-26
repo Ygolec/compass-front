@@ -209,7 +209,6 @@ export default defineEventHandler(async (event) => {
                     }
                 )
             );
-            console.log(endedApplicationFromApprovedUser)
         }
 
         // Все остальные заявки (match) от того пользователя помечаем "rejected"

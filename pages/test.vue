@@ -31,7 +31,7 @@ async function me() {
 
 async function login(){
   const config = useRuntimeConfig();
-  const backendResponse = await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/login`, {
+  const backendResponse = await $fetch(`${config.AUTH_BACKEND_URL}/api/v1/users/login`, {
     method: 'POST',
     credentials: 'include',
     headers: {

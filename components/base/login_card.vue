@@ -2,8 +2,8 @@
   <registration_dialog :dialog="registration_dialog" @update:dialog="registration_dialog = $event"/>
   <v-container>
     <v-card
-        class="mx-auto my-auto"
-        min-width="500"
+        class="mx-auto my-auto w-90"
+        min-width=""
         max-width=""
     >
       <v-card-title>Вход</v-card-title>

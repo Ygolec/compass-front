@@ -5,10 +5,10 @@
       max-width="500"
   >
     <v-card
-        class="mx-auto my-auto"
-        min-width="500"
+        class="mx-auto my-auto w-100"
     >
       <v-window
+          :touch="false"
           v-model="registration_step">
         <v-window-item :value="0">
           <v-form @submit.prevent="handle_submit">

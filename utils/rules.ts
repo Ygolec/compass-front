@@ -36,3 +36,20 @@ export function password_confirm(password: Ref<string>) {
         };
     });
 }
+export function telegram_tag_check(data: string): boolean | string {
+    const pattern = "^@[a-zA-Z0-9_]{5,32}$";
+    if (new RegExp(pattern).test(data)) {
+        return true;
+    } else {
+        return "Неверный формат Telegram-тега. Тег должен начинаться с '@', содержать от 5 до 32 символов: латинские буквы, цифры и знак подчеркивания.";
+    }
+}
+
+export function phone_russian_check(data: string): boolean | string {
+    const pattern = "^\\+7\\d{10}$";
+    if (new RegExp(pattern).test(data)) {
+        return true;
+    } else {
+        return "Неверный формат номера телефона. Введите номер в формате +7XXXXXXXXXX (10 цифр после +7).";
+    }
+}

@@ -53,6 +53,7 @@ export default defineEventHandler(async (event) => {
 
         const student_relocation_applications_match = await client.request(readItems('student_relocation_applications_match', {
             fields:['*' +
+            ',relocation_applications_id_from.id' +
             ',relocation_applications_id_from.student_accommodation_id_from.*' +
             ',relocation_applications_id_from.student_accommodation_from_address_id.*' +
             ',relocation_applications_id_from.floor'+
