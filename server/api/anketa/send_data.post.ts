@@ -53,7 +53,9 @@ export default defineEventHandler(async (event) => {
             hobbies: anketa_data.hobbies,
             russianproficiency: anketa_data.russianProficiency,
             englishproficiency: anketa_data.englishProficiency,
-            roomstyle: anketa_data.roomStyle
+            roomstyle: anketa_data.roomStyle,
+            doSmoke: anketa_data.doSmoke,
+            earlyBird: anketa_data.earlyBird
         })));
         console.log(create_anketa);
     } catch (error) {

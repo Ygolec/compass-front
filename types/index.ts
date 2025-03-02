@@ -29,6 +29,8 @@ declare global {
         russianProficiency: string;
         englishProficiency: string;
         roomStyle: string;
+        doSmoke: boolean;
+        earlyBird: boolean;
     }
 
     interface DirectusError {

@@ -38,6 +38,9 @@
       <v-checkbox v-model="anketa_data.hasHobbies" label="Есть хобби?"></v-checkbox>
       <v-combobox v-if="anketa_data.hasHobbies" v-model="anketa_data.hobbies" label="Какие у вас хобби?" multiple :items="hobbiesList"></v-combobox>
 
+      <v-checkbox v-model="anketa_data.doSmoke" label="Курите?"></v-checkbox>
+      <v-checkbox v-model="anketa_data.earlyBird" label="Рано просыпаетесь?"></v-checkbox>
+
       <v-divider class="my-4"></v-divider>
       <v-select v-model="anketa_data.russianProficiency" label="Знание русского языка" :items="['Начальный', 'Средний', 'Свободный']" :rules="[required]"></v-select>
       <v-select v-model="anketa_data.englishProficiency" label="Знание английского языка" :items="['Начальный', 'Средний', 'Свободный']" :rules="[required]"></v-select>
@@ -95,7 +98,9 @@ const anketa_data = ref({
   boardGames: false,
   russianProficiency: '',
   englishProficiency: '',
-  roomStyle: ''
+  roomStyle: '',
+  doSmoke: false,
+  earlyBird: false
 });
 
 const emailExists = ref(false);
