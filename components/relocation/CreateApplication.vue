@@ -121,7 +121,7 @@
       </v-form>
     </v-card>
   </v-dialog>
-  <snackbar @update:snackbar="snackbar = $event" :snackbar="snackbar" :details="snackbar_details"/>
+  <Snackbar @update:snackbar="snackbar = $event" :snackbar="snackbar" :details="snackbar_details"/>
 </template>
 <script setup lang="ts">
 import {
@@ -129,8 +129,8 @@ import {
   required,
   telegram_tag_check
 } from "~/utils/rules";
-import Snackbar from "~/components/base/snackbar.vue";
-import Confirm_dialog from "~/components/base/confirm_dialog.vue";
+import Snackbar from "~/components/base/Snackbar.vue";
+import ConfirmDialog from "~/components/base/ConfirmDialog.vue";
 
 const snackbar_details = ref<{
   text: string,

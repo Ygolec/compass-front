@@ -14,7 +14,7 @@ declare global {
         date_end: string;
     }
 
-    interface student_accommodation_addresses {
+    interface StudentAccommodationAddresses {
         id: string;
         city: string;
         street: string;
@@ -27,7 +27,7 @@ declare global {
         id: string;
         name: string;
         type: string;
-        addresses: student_accommodation_addresses[];
+        addresses: StudentAccommodationAddresses[];
         capacity_ids: string[];
         facilities_ids: string[];
     }
@@ -35,7 +35,7 @@ declare global {
     interface student_accommodations_with_addresses {
         id: string;
         name: string;
-        addresses: student_accommodation_addresses[];
+        addresses: StudentAccommodationAddresses[];
     }
 
     interface student_application {
@@ -100,7 +100,7 @@ declare global {
         photos_of_room: any[any]
     }
 
-    interface student_relocation_application_details {
+    interface StudentRelocationApplicationDetails {
         id: string,
         status: string,
         user_created: {
@@ -121,8 +121,8 @@ declare global {
         gender: string,
         telegram: string,
         phone_number: string,
-        student_accommodation_from_address_id: student_accommodation_addresses,
-        student_accommodation_to_address_id: student_accommodation_addresses,
+        student_accommodation_from_address_id: StudentAccommodationAddresses,
+        student_accommodation_to_address_id: StudentAccommodationAddresses,
         photos_of_room: [
             {
                 id:string,

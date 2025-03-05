@@ -14,8 +14,6 @@
           :items="student_relocation_applications_match"
           :items-length="items_length"
           :loading="loading"
-          :page="page"
-          :sort-by="sortBy"
           item-value="id"
           @update:options="load_applications"
           loading-text="Загрузка... Пожалуйста подождите"
@@ -26,7 +24,7 @@
               density="compact"
               flat
           >
-            <v-toolbar-title>Список с предложениями на переселение ко мне</v-toolbar-title>
+            <v-toolbar-title>Список с отправленными предложениями</v-toolbar-title>
             <v-divider
                 class="mx-4"
                 inset
@@ -44,11 +42,11 @@
           </v-toolbar>
         </template>
         <template v-slot:item.full_name="{ item }">
-          {{ item.relocation_applications_id_from.user_created.first_name }}
-          {{ item.relocation_applications_id_from.user_created.last_name }}
+          {{ item.relocation_applications_id_to.user_created.first_name }}
+          {{ item.relocation_applications_id_to.user_created.last_name }}
         </template>
         <template v-slot:item.address="{ item }">
-          {{ get_address(item.relocation_applications_id_from.student_accommodation_from_address_id) }}
+          {{ get_address(item.relocation_applications_id_to.student_accommodation_from_address_id) }}
         </template>
         <template v-slot:item.status="{ item }">
           <v-chip>
@@ -65,11 +63,11 @@
               </v-btn>
             </template>
             <v-list>
-              <v-list-item @click="watch_details_about_application(item.relocation_applications_id_from.id)">
+              <v-list-item @click="">
                 Просмотр заявки
               </v-list-item>
-              <v-list-item @click="accept_application_match(item.id)">
-                Принять заявку
+              <v-list-item @click="cancel_application_match(item.id)">
+                Отменить свою заявку
               </v-list-item>
             </v-list>
           </v-menu>
@@ -77,42 +75,22 @@
       </v-data-table-server>
     </v-card-text>
   </v-card>
-  <snackbar @update:snackbar="snackbar = $event" :snackbar="snackbar" :details="snackbar_details"/>
-  <application_detail_dialog_by_id :dialog="dialog_detail" @update:dialog="dialog_detail = $event"
-                      :student_relocation_applications_id="dialog_student_relocation_applications_id"/>
 </template>
 <script setup lang="ts">
 import {useAuthStore} from "~/stores/auth_store";
-import Snackbar from "~/components/base/snackbar.vue";
-import Application_detail_dialog_by_id from "~/components/relocation/application_detail_dialog_by_id.vue";
 
-const dialog_detail= ref(false)
-const dialog_student_relocation_applications_id = ref(0)
-
-const snackbar_details = ref<{
-  text: string,
-  color: string,
-  timeout: number,
-  button_close_color: string
-}>({
-  text: '',
-  color: '',
-  timeout: 5000,
-  button_close_color: 'green'
-});
-const snackbar = ref(false)
 const authStore = useAuthStore();
 const student_relocation_applications_match = ref()
 const route = useRoute()
 const itemsPerPage = ref(5)
+const loading = ref(false)
 const page = ref(1)
 const sortBy = ref([])
-const loading = ref(false)
 const headers = ref([
   {title: 'ФИО', key: 'full_name'},
-  {title: 'Общежитие куда', key: 'relocation_applications_id_from.student_accommodation_id_from.name'},
+  {title: 'Общежитие куда', key: 'relocation_applications_id_to.student_accommodation_id_from.name'},
   {title: 'Адрес общежития переселения', key: 'address'},
-  {title: 'Этаж', key: 'relocation_applications_id_from.floor'},
+  {title: 'Этаж', key: 'relocation_applications_id_to.floor'},
   {title: 'Статус', key: 'status'},
   {title: 'Действия', key: 'actions', align: "center"},
 ])
@@ -121,7 +99,7 @@ const items_length = ref(0)
 async function load_applications({page, itemsPerPage, sortBy}) {
   loading.value = true
   try {
-    student_relocation_applications_match.value = await $fetch(`/api/student_relocation_applications_match/applications_for_user`, {
+    student_relocation_applications_match.value = await $fetch(`/api/student_relocation_applications_match/sent_applications_by_user`, {
       method: 'POST',
       body: {relocation_id: route.params.id, page, itemsPerPage, sortBy},
     });
@@ -134,7 +112,7 @@ async function load_applications({page, itemsPerPage, sortBy}) {
   }
 }
 
-const get_address = (address: student_accommodation_addresses) => {
+const get_address = (address: StudentAccommodationAddresses) => {
   const parts = [
     address.city,
     address.street,
@@ -159,30 +137,16 @@ const get_status = (status: string) => {
   }
 }
 
-async function accept_application_match(id: number) {
+async function cancel_application_match(id: number) {
   try {
-    await $fetch(`/api/student_relocation_applications_match/accept_by_user`, {
+    await $fetch(`/api/student_relocation_applications_match/cancel_by_user`, {
       method: 'POST',
-      body: {student_relocation_applications_match_id: id, relocation_id: route.params.id},
+      body: {student_relocation_applications_match_id:id, relocation_id: route.params.id},
     });
-    await load_applications({page: page, itemsPerPage: itemsPerPage, sortBy: sortBy})
-  } catch (error:any) {
-    if (error.response?._data?.message === "Your application is closed") {
-      snackbar_details.value = {
-        text: 'Ваша заявка на переселение уже закрыта',
-        timeout: 5000,
-        color: 'yellow',
-        button_close_color: 'red'
-      }
-      snackbar.value = true
-    }
+    await load_applications({page: 1, itemsPerPage: 5, sortBy: []})
+  } catch (error) {
     console.error(error)
   }
-}
-
-function watch_details_about_application(application_id: number) {
-  dialog_student_relocation_applications_id.value = application_id
-  dialog_detail.value = true
 }
 </script>
 <style scoped>

@@ -1,5 +1,5 @@
 <template>
-  <registration_dialog :dialog="registration_dialog" @update:dialog="registration_dialog = $event"/>
+  <RegistrationDialog :dialog="registration_dialog" @update:dialog="registration_dialog = $event"/>
   <v-container>
     <v-card
         class="mx-auto my-auto w-90"
@@ -51,7 +51,7 @@
 </template>
 <script setup lang="ts">
 import {email_hse_student_check, required} from "~/utils/rules";
-import Registration_dialog from "~/components/base/registration_dialog.vue";
+import RegistrationDialog from "~/components/auth/RegistrationDialog.vue";
 import {useAuthStore} from "~/stores/auth_store";
 
 const authStore = useAuthStore();

@@ -1,8 +1,8 @@
 <template>
-  <login_card></login_card>
+  <login-card></login-card>
 </template>
 <script setup lang="ts">
-import Login_card from "~/components/base/login_card.vue";
+import LoginCard from "~/components/auth/LoginCard.vue";
 import {definePageMeta} from "#imports";
 
 definePageMeta({

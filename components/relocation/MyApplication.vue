@@ -1,5 +1,5 @@
 <template>
-  <create_application :dialog="create_application_dialog" @update:dialog="create_application_dialog = $event"/>
+  <create-application :dialog="create_application_dialog" @update:dialog="create_application_dialog = $event"/>
   <v-card>
     <v-card-text>
       <v-empty-state
@@ -178,7 +178,7 @@
       </v-btn>
     </v-card-actions>
   </v-card>
-  <confirm_dialog
+  <ConfirmDialog
       :dialog="confirm_dialog"
       @update:dialog="confirm_dialog = $event"
       :details="details_confirm"
@@ -186,9 +186,9 @@
   />
 </template>
 <script setup lang="ts">
-import Create_application from "~/components/relocation/create_application.vue";
+import CreateApplication from "~/components/relocation/CreateApplication.vue";
 import {useAuthStore} from "~/stores/auth_store";
-import Confirm_dialog from "~/components/base/confirm_dialog.vue";
+import ConfirmDialog from "~/components/base/ConfirmDialog.vue";
 
 const confirm_dialog = ref(false)
 const details_confirm = ref({
@@ -201,8 +201,8 @@ const confirm_loading = ref(false)
 const create_application_dialog = ref<boolean>(false);
 const authStore = useAuthStore();
 const route = useRoute()
-const student_relocation_application = ref<student_relocation_application_details>()
-const get_address = (address: student_accommodation_addresses) => {
+const student_relocation_application = ref<StudentRelocationApplicationDetails>()
+const get_address = (address: StudentAccommodationAddresses) => {
   const parts = [
     address.city,
     address.street,
@@ -228,7 +228,7 @@ async function cancel_my_application(){
 }
 
 onMounted(async () => {
-  student_relocation_application.value = await $fetch<student_relocation_application_details>(`/api/student_relocation_applications/application_by_user`, {
+  student_relocation_application.value = await $fetch<StudentRelocationApplicationDetails>(`/api/student_relocation_applications/application_by_user`, {
     method: 'POST',
     body: {relocation_id: route.params.id},
   });

@@ -8,7 +8,6 @@
           title="Вы не авторизированы.">
       </v-empty-state>
       <v-data-table-server
-
           v-if="authStore.isAuthenticated"
           v-model:items-per-page="itemsPerPage"
           :headers="headers"
@@ -26,7 +25,7 @@
               density="compact"
               flat
           >
-            <v-toolbar-title>Список с рекомендованными заявлениями</v-toolbar-title>
+            <v-toolbar-title>Список со всеми заявками</v-toolbar-title>
             <v-divider
                 class="mx-4"
                 inset
@@ -55,12 +54,13 @@
       </v-data-table-server>
     </v-card-text>
   </v-card>
-  <application_detail :dialog="dialog_detail" @update:dialog="dialog_detail = $event"
-                      :student_relocation_applications_id="dialog_student_relocation_applications_id"/>
+  <ApplicationDetail :dialog="dialog_detail" @update:dialog="dialog_detail = $event" :student_relocation_applications_id="dialog_student_relocation_applications_id" :showSubmitButton="true"/>
+
+
 </template>
 <script setup lang="ts">
 import {useAuthStore} from "~/stores/auth_store";
-import Application_detail from "~/components/relocation/application_detail.vue";
+import ApplicationDetail from "~/components/relocation/ApplicationDetail.vue";
 
 const dialog_detail = ref(false)
 const dialog_student_relocation_applications_id = ref(0)
@@ -73,6 +73,7 @@ const page = ref(1)
 const sortBy = ref([])
 const itemsPerPage = ref(5)
 const headers = ref([
+  {title: 'Имя заявителя', key: 'user_created.first_name'},
   {title: 'Общежитие откуда', key: 'student_accommodation_id_from.name'},
   {title: 'Общежитие куда', key: 'student_accommodation_id_to.name'},
   {title: 'Этаж', key: 'floor'},
@@ -84,11 +85,11 @@ const items_length = ref(0)
 async function load_applications({page, itemsPerPage, sortBy}) {
   loading.value = true
   try {
-    student_relocation_applications.value = await $fetch(`/api/student_relocation_applications/recommended_for_user`, {
+    student_relocation_applications.value = await $fetch(`/api/student_relocation_applications/all`, {
       method: 'POST',
       body: {relocation_id: route.params.id, page, itemsPerPage, sortBy},
     });
-  } catch (error) {
+  } catch (error:any) {
     console.error(error)
   } finally {
     loading.value = false
@@ -116,6 +117,7 @@ const get_status = (status: string) => {
       return 'Неизвестно'
   }
 }
+
 
 </script>
 <style scoped>

@@ -13,7 +13,7 @@ import {readBody} from "h3";
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     const client = createDirectus(config.DIRECTUS_URL).with(staticToken(config.DIRECTUS_TOKEN)).with(rest());
-    const student_relocation_application = await readBody<student_relocation_application_details>(event);
+    const student_relocation_application = await readBody<StudentRelocationApplicationDetails>(event);
     const headers = getHeaders(event)
 
     if (!headers) {

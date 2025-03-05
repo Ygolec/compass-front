@@ -38,19 +38,19 @@
                 </v-tabs>
                 <v-tabs-window v-model="tab">
                   <v-tabs-window-item value="my-application">
-                    <my_application/>
+                    <my-application/>
                   </v-tabs-window-item>
                   <v-tabs-window-item value="sent-application">
-                    <sent_application/>
+                    <sent-applications/>
                   </v-tabs-window-item>
                   <v-tabs-window-item value="applications_to_me">
-                    <applications_to_me/>
+                    <applications-to-me/>
                   </v-tabs-window-item>
                   <v-tabs-window-item value="recommended-application">
-                    <recommended_application/>
+                    <recommended-applications/>
                   </v-tabs-window-item>
                   <v-tabs-window-item value="all-application">
-                    <all_application/>
+                    <all-applications/>
                   </v-tabs-window-item>
                 </v-tabs-window>
               </v-card-item>
@@ -63,11 +63,11 @@
 
 </template>
 <script setup lang="ts">
-import My_application from "~/components/relocation/my_application.vue";
-import Recommended_application from "~/components/relocation/recommended_application.vue";
-import All_application from "~/components/relocation/all_application.vue";
-import Sent_application from "~/components/relocation/sent_application.vue";
-import Applications_to_me from "~/components/relocation/applications_to_me.vue";
+import MyApplication from "~/components/relocation/MyApplication.vue";
+import RecommendedApplications from "~/components/relocation/RecommendedApplications.vue";
+import AllApplications from "~/components/relocation/AllApplications.vue";
+import SentApplications from "~/components/relocation/SentApplications.vue";
+import ApplicationsToMe from "~/components/relocation/ApplicationsToMe.vue";
 
 const route = useRoute()
 const tab = ref<string>('my-application')

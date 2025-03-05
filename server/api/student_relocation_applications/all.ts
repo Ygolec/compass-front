@@ -7,8 +7,8 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     try {
-        const count=await client.request(readItems('student_relocation_applications',{
-            fields:['id'],
+        const count = await client.request(readItems('student_relocation_applications', {
+            fields: ['id'],
             filter: {
                 student_relocation_id: {
                     _eq: body.relocation_id
@@ -29,7 +29,11 @@ export default defineEventHandler(async (event) => {
         }))
 
         const result = await client.request(readItems('student_relocation_applications', {
-            fields: ['*,student_accommodation_to_address_id.*,photos_of_room.*,student_accommodation_from_address_id.*,student_accommodation_id_from.*,student_accommodation_id_to.*'],
+            fields: ['*,' +
+            'student_accommodation_to_address_id.*,' +
+            'photos_of_room.*,student_accommodation_from_address_id.*,' +
+            'student_accommodation_id_from.*,student_accommodation_id_to.*,' +
+            'user_created.first_name'],
             ...(body.limit && {limit: body.itemsPerPage}),
             ...(body.page && {page: body.page}),
             // ...(body.sortBy && { sort: ['sort',`-${body.sortBy}`] }),
