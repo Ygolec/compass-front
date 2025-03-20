@@ -36,6 +36,10 @@
           </v-list-item>
           <v-divider></v-divider>
           <v-list-item>
+            <v-btn block href="/profile">Профиль</v-btn>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item>
             <v-btn block @click="logout">Выйти</v-btn>
           </v-list-item>
         </template>

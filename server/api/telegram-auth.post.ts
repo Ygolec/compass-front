@@ -1,48 +1,109 @@
-import { defineEventHandler, getQuery } from 'h3'
+import {defineEventHandler, getQuery} from 'h3'
 import * as crypto from 'crypto'
+import {createDirectus, createItem, readItems, rest, staticToken, updateItem} from "@directus/sdk";
 
-const config = useRuntimeConfig()
+function verifyTelegramLoginData(params: Record<string, string>, botToken: string): boolean {
+    // 1. Извлекаем `hash`, остальные поля идут в data_check_string
+    const {hash, ...data} = params
+    if (!hash) {
+        return false
+    }
 
-// Получаем токен вашего бота (т.к. нужно для проверки подписи)
-const BOT_TOKEN = config.TELEGRAM_TOKEN // или держите как-то ещё
 
-export default defineEventHandler(async (event) => {
-    // Из GET или POST параметров (зависит от того, как вы настроили)
-    const query = getQuery(event)
-
-    // Все ключи, кроме hash, сортируем и собираем в строку "key=value\n"
-    const { hash, ...data } = query
+    // 2. Формируем data_check_string — «key=value\nkey2=value2\n...»
+    //    Сортировка по алфавиту ключей
     const dataCheckArr = Object.keys(data)
         .sort()
-        .map((key) => `${key}=${data[key]}`)
+        .map(key => `${key}=${data[key]}`)
         .join('\n')
 
-    // Формируем ключ HMAC из ключа SHA256( "WebAppData" + bot_token )
+    // 3. secret_key = SHA256(<bot_token>)
     const secretKey = crypto
         .createHash('sha256')
-        .update(BOT_TOKEN)
+        .update(botToken)
         .digest()
 
-    // Высчитываем хеш
+    // 4. hmac = HMAC_SHA256(data_check_string, secret_key)
     const hmac = crypto
         .createHmac('sha256', secretKey)
         .update(dataCheckArr)
         .digest('hex')
 
-    // Сравниваем с пришедшим hash (нужно сравнивать в «lowercase» варианте)
-    if (hmac !== hash) {
-        // Значит данные подделаны, отказываем
-        throw new Error('Invalid hash from Telegram')
+
+    // 5. Сравниваем hmac с пришедшим от Telegram hash
+    //    Обычно hash и hmac используют нижний регистр (lowercase)
+    return hmac === hash
+}
+
+const config = useRuntimeConfig();
+// Подставьте реальный токен бота
+const BOT_TOKEN = config.TELEGRAM_TOKEN
+
+export default defineEventHandler(async (event) => {
+    const headers = getHeaders(event)
+    const query = getQuery(event)
+    const config = useRuntimeConfig();
+    const client = createDirectus(config.DIRECTUS_URL).with(staticToken(config.DIRECTUS_TOKEN)).with(rest());
+
+
+    const user: user = await $fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+        headers: headers as HeadersInit
+    });
+
+    if (!user) {
+        throw createError({
+            statusCode: 401,
+            message: 'Unauthorized',
+        })
     }
 
-    // Если hash совпал — данные подлинные
-    // Можно извлечь из data, например, user_id
-    const telegramId = data.id
-    const username = data.username
-    console.log(data);
-    // ...и т.д.
+    // Из параметров отделяем hash
+    const {hash, ...data} = query
+
+    // Если хеша нет, либо нет нужных полей — отказываем
+    if (!hash || !data.id || !data.auth_date) {
+        return {error: 'Missing required Telegram data'}
+    }
+
+    if (verifyTelegramLoginData(query, BOT_TOKEN)) {
+        const is_user_have_telegram_id = await client.request(readItems('telegram_user_links', {
+            filter: {
+                telegram_id: {
+                    '_eq': data.id
+                }
+            }
+        }))
+        if (is_user_have_telegram_id.length !== 0) {
+            if (is_user_have_telegram_id.status === 'link') {
+                throw createError({
+                    statusCode: 400,
+                    message: 'Telegram id already exists',
+                })
+            } else {
+                const update_telegram_user_link = await client.request(updateItem('telegram_user_links', is_user_have_telegram_id[0].id, {
+                    user_id: user.directus_id,
+                    telegram_id: data.id,
+                    telegram_username: data.username,
+                    status: 'link'
+                }))
+            }
+
+            return {
+                success: true,
+            }
+        }
+        const create_telegram_user_link = await client.request(createItem('telegram_user_links', {
+            user_id: user.directus_id,
+            telegram_id: data.id,
+            telegram_username: data.username,
+        }))
+
+        return {
+            success: true,
+        }
+    }
 
 
-
-    return { success: true }
 })
