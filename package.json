@@ -21,15 +21,15 @@
     "bun": "^1.2.2",
     "bunx": "^0.1.0",
     "cheerio": "^1.0.0",
+    "docx": "^9.1.1",
+    "file-saver": "^2.0.5",
     "glob": "^11.0.1",
+    "jspdf": "^3.0.1",
     "node-fetch": "^3.3.2",
+    "nutrient": "^0.0.1",
     "nuxt": "^3.15.4",
     "nuxt-mail": "^5.1.1",
     "nuxt-telegram-auth": "^1.2.0",
-    "docx": "^9.1.1",
-    "file-saver": "^2.0.5",
-    "jspdf": "^2.5.2",
-    "nutrient": "^0.0.1",
     "pinia": "^2.2.6",
     "tough-cookie": "^5.1.0",
     "vue": "latest",
@@ -43,7 +43,7 @@
     "prisma": "^6.2.1",
     "sass-embedded": "^1.83.4",
     "vite-plugin-vuetify": "^2.0.4",
-    "vuetify": "^3.7.4"
+    "vuetify": "^3.7.18"
   },
   "trustedDependencies": [
     "@parcel/watcher"
