@@ -9,6 +9,9 @@ import AvatarMenu from "~/components/layouts/AvatarMenu.vue";
       <v-app-bar-title>
         <v-btn href="/">Compass</v-btn>
         <v-btn href="/relocation">Переселение</v-btn>
+        <v-btn href="/relocation-files" prepend-icon="mdi-file-document-multiple">
+          Файлы переселения
+        </v-btn>
       </v-app-bar-title>
       <v-app-bar-nav-icon
           class="mr-5"
@@ -23,5 +26,7 @@ import AvatarMenu from "~/components/layouts/AvatarMenu.vue";
 </template>
 
 <style scoped>
-
+.v-btn {
+  margin-right: 8px;
+}
 </style>

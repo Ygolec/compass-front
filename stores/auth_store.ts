@@ -1,32 +1,41 @@
 import {defineStore} from 'pinia';
 
+interface User {
+    name: string;
+    email: string;
+    directus_id: string;
+    role: {
+        name: string;
+    };
+}
+
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        access_token: '' as string | null,
-        user: null as user | null,
+        access_token: null as string | null,
+        user: null as User | null,
     }),
 
     getters: {
         isAuthenticated: (state) => !!state.access_token,
+        isAdmin: (state) => state.user?.role?.name === 'Adminitrator',
+        isManager: (state) => state.user?.role?.name === 'Dormitory Admin',
+        canAccessFiles: (state) => {
+            const allowedRoles = ['Adminitrator', 'Adminitrator Admin'];
+            return state.user?.role?.name && allowedRoles.includes(state.user.role.name);
+        }
     },
 
     actions: {
-        async login(credentials: user) {
+        async login(credentials: { email: string; password: string }) {
             try {
-                // const config = useRuntimeConfig();
-                // const data = await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/login`, {
-                //     method: 'POST',
-                //     body: credentials,
-                //     credentials: 'include'
-                // });
-                const data = await $fetch('/api/auth/login', {
+                const data = await $fetch<{ access_token: string }>('/api/auth/login', {
                     method: 'POST',
                     body: credentials,
                 });
                 this.setAccessToken(data.access_token);
                 await this.fetchCurrentUser();
             } catch (error) {
-                console.error('Login error:', error);
+                console.error('Ошибка входа:', error);
                 throw error;
             }
         },
@@ -34,61 +43,27 @@ export const useAuthStore = defineStore('auth', {
         setAccessToken(token: string) {
             this.access_token = token;
             if (process.client) {
-                localStorage.setItem('access_token', token);
+                localStorage.setItem('auth_token', token);
             }
-        },
-
-        setUser(user: { name: string; email: string }) {
-            this.user = user;
         },
 
         async logout() {
             try {
-                // const config = useRuntimeConfig();
-                // await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/logout`, {
-                //     method: 'POST',
-                //     credentials: 'include'
-                // });
                 await $fetch('/api/auth/logout', {
                     method: 'POST',
-                    credentials: 'include'
                 });
+                this.clearAccessToken();
+                this.clearUser();
             } catch (error) {
-                console.error('Logout error:', error);
+                console.error('Ошибка выхода:', error);
+                throw error;
             }
-            this.clearAccessToken();
-            this.clearUser();
         },
 
         clearAccessToken() {
             this.access_token = null;
             if (process.client) {
-                localStorage.removeItem('access_token');
-            }
-        },
-
-        loadTokenFromStorage() {
-            if (process.client) {
-                const saved = localStorage.getItem('access_token');
-                if (saved) this.access_token = saved;
-            }
-        },
-
-        async refreshAccessToken() {
-            try {
-                // const config = useRuntimeConfig();
-                // await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/refresh`, {
-                //     method: 'POST',
-                //     credentials: 'include'
-                // });
-                const data = await $fetch('/api/auth/refresh', {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                this.setAccessToken(data.access_token);
-            } catch (err) {
-                console.error('Refresh token error:', err);
-                await this.logout();
+                localStorage.removeItem('auth_token');
             }
         },
 
@@ -98,23 +73,25 @@ export const useAuthStore = defineStore('auth', {
 
         async fetchCurrentUser() {
             try {
-                // const config = useRuntimeConfig();
-                // const data = await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/me`, {
-                //     method: 'GET',
-                //     credentials: 'include'
-                // });
-                const data = await $fetch('/api/auth/me', {
+                const data = await $fetch<User>('/api/auth/me', {
                     method: 'GET',
-                    credentials: 'include',
                 });
-                this.setUser(data);
-            } catch (error: any) {
+                this.user = data;
+            } catch (error) {
                 console.error('Ошибка получения данных пользователя:', error);
-                if (error?.response?.status === 401) {
-                    await this.logout();
-                }
+                this.logout();
+                throw error;
             }
         },
 
+        initAuth() {
+            if (process.client) {
+                const token = localStorage.getItem('auth_token');
+                if (token) {
+                    this.setAccessToken(token);
+                    this.fetchCurrentUser();
+                }
+            }
+        }
     },
 });
