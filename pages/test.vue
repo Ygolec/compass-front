@@ -8,7 +8,6 @@
   <v-btn @click="me()">me</v-btn>
   <v-btn @click="login()">login</v-btn>
   <v-btn @click="match()">match</v-btn>
-
 </template>
 
 <script setup lang="ts">

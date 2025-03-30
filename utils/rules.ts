@@ -108,4 +108,3 @@ export const validateAnketaData = (anketa: anketa_data) => {
 
     if (anketa.hasHobbies) req(anketa.hobbies, "Hobbies");
 };
-
