@@ -1,32 +1,44 @@
+import { defineEventHandler, createError } from 'h3';
+
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
+    const body = await readBody(event);
+
+    if (!body.refresh_token) {
+        throw createError({
+            statusCode: 401,
+            message: 'Не авторизован',
+        });
+    }
 
     try {
-
-        const backendResponse = await fetch(`${config.AUTH_BACKEND_URL}/api/v1/users/logout`, {
+        const response = await fetch(`${config.DIRECTUS_URL}/auth/logout`, {
             method: 'POST',
-            credentials: 'include',
-        })
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                refresh_token: body.refresh_token
+            }),
+        });
 
-        // 3. Получаем JSON-данные из ответа бэкенда
-        const data = await backendResponse.json()
-
-        // 4. Читаем Set-Cookie из заголовков бэкенда
-        const setCookie = backendResponse.headers.get('set-cookie')
-        if (setCookie) {
-            // Устанавливаем cookie в ответ Nuxt-сервера
-            // Благодаря этому на фронтенде у пользователя будет установлена кука
-            event.node.res.setHeader('Set-Cookie', setCookie)
+        if (!response.ok) {
+            throw createError({
+                statusCode: response.status,
+                message: 'Ошибка при выходе из системы',
+            });
         }
 
-        // 5. Возвращаем тело ответа (JSON) обратно на фронтенд
-        return data
-        // Отправляем запрос на внешний API для выхода пользователя
+        return { success: true };
     } catch (error: any) {
-        console.error('Ошибка выхода:', error);
+        if (error.statusCode) {
+            throw error;
+        }
+
         throw createError({
-            statusCode: error.response?.status || 500,
-            message: 'Ошибка выхода',
+            statusCode: 500,
+            message: 'Ошибка при выходе из системы',
+            cause: error,
         });
     }
 });

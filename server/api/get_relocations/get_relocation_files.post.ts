@@ -9,6 +9,7 @@ interface User {
 export default defineEventHandler(async (event) => {
     try {
         const config = useRuntimeConfig();
+        const body = await readBody(event);
         
         // Проверяем наличие необходимых переменных окружения
         if (!config.DIRECTUS_URL || !config.DIRECTUS_TOKEN) {
@@ -26,7 +27,9 @@ export default defineEventHandler(async (event) => {
         // Получаем информацию о текущем пользователе из /api/auth/me
         const authUser = await $fetch<{ directus_id: string }>('/api/auth/me', {
             method: 'GET',
-            credentials: 'include',
+            query: {
+                access_token: body.access_token
+            }
         });
 
         if (!authUser?.directus_id) {

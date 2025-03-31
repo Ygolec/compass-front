@@ -149,6 +149,9 @@ export default {
     const authStore = useAuthStore();
     return { authStore };
   },
+  mounted() {
+    this.fetchRelocations();
+  },
   methods: {
     async fetchRelocations() {
       if (!this.authStore.canAccessFiles) {
@@ -159,7 +162,9 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.post('/api/get_relocations/get_relocation_files');
+        const response = await axios.post('/api/get_relocations/get_relocation_files', {
+          access_token: this.authStore.access_token
+        });
         
         if (!response.data || !Array.isArray(response.data)) {
           throw new Error('Некорректный формат данных от сервера');
@@ -314,9 +319,6 @@ export default {
       const blob = await Packer.toBlob(doc);
       saveAs(blob, `Заявления_на_переселение_${groupName}.docx`);
     },
-  },
-  mounted() {
-    this.fetchRelocations();
   },
 };
 </script>
