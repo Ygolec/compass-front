@@ -2,15 +2,13 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <v-card v-if="authStore.isAuthenticated">
+        <!-- Временно отключаем проверку авторизации -->
+        <v-card>
           <v-card-title class="text-h5 mb-4">Анкета для заселения</v-card-title>
           <v-card-text>
             <AnketaDialogue />
           </v-card-text>
         </v-card>
-        <v-alert v-else type="warning">
-          Для заполнения анкеты необходимо авторизоваться
-        </v-alert>
       </v-col>
     </v-row>
   </v-container>
@@ -22,7 +20,8 @@ import AnketaDialogue from '~/components/anketa/AnketaDialogue.vue';
 
 const authStore = useAuthStore();
 
-definePageMeta({
-  middleware: ['auth']
-});
+// Временно отключаем middleware
+// definePageMeta({
+//   middleware: ['auth']
+// });
 </script> 

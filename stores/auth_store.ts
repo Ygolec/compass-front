@@ -1,25 +1,40 @@
 import {defineStore} from 'pinia';
 
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    directus_id?: string;
+}
+
+interface UserApiResponse {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    directus_id?: string;
+}
+
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         access_token: '' as string | null,
-        user: null as user | null,
+        user: null as User | null,
     }),
 
     getters: {
         isAuthenticated: (state) => !!state.access_token,
+        canAccessFiles: (state) => {
+            if (!state.user || !state.user.role) return false;
+            const allowedRoles = ['admin', 'manager', 'coordinator', 'administrator'];
+            return allowedRoles.includes(state.user.role.toLowerCase());
+        }
     },
 
     actions: {
-        async login(credentials: user) {
+        async login(credentials: { email: string; password: string }) {
             try {
-                // const config = useRuntimeConfig();
-                // const data = await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/login`, {
-                //     method: 'POST',
-                //     body: credentials,
-                //     credentials: 'include'
-                // });
-                const data = await $fetch('/api/auth/login', {
+                const data = await $fetch<{ access_token: string }>('/api/auth/login', {
                     method: 'POST',
                     body: credentials,
                 });
@@ -38,17 +53,18 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
-        setUser(user: { name: string; email: string }) {
-            this.user = user;
+        setUser(userData: UserApiResponse) {
+            this.user = {
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                role: userData.role,
+                directus_id: userData.directus_id
+            };
         },
 
         async logout() {
             try {
-                // const config = useRuntimeConfig();
-                // await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/logout`, {
-                //     method: 'POST',
-                //     credentials: 'include'
-                // });
                 await $fetch('/api/auth/logout', {
                     method: 'POST',
                     credentials: 'include'
@@ -76,12 +92,7 @@ export const useAuthStore = defineStore('auth', {
 
         async refreshAccessToken() {
             try {
-                // const config = useRuntimeConfig();
-                // await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/refresh`, {
-                //     method: 'POST',
-                //     credentials: 'include'
-                // });
-                const data = await $fetch('/api/auth/refresh', {
+                const data = await $fetch<{ access_token: string }>('/api/auth/refresh', {
                     method: 'POST',
                     credentials: 'include'
                 });
@@ -98,12 +109,7 @@ export const useAuthStore = defineStore('auth', {
 
         async fetchCurrentUser() {
             try {
-                // const config = useRuntimeConfig();
-                // const data = await $fetch(`${config.public.AUTH_BACKEND_URL}/api/v1/users/me`, {
-                //     method: 'GET',
-                //     credentials: 'include'
-                // });
-                const data = await $fetch('/api/auth/me', {
+                const data = await $fetch<UserApiResponse>('/api/auth/me', {
                     method: 'GET',
                     credentials: 'include',
                 });
