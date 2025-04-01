@@ -1,4 +1,4 @@
-import {defineEventHandler, readBody, createError} from 'h3';
+import {defineEventHandler, readBody} from 'h3';
 import {email_hse_student_check} from "~/utils/rules";
 
 export default defineEventHandler(async (event) => {
@@ -9,89 +9,90 @@ export default defineEventHandler(async (event) => {
 
     if (!body.email || !body.password) {
         throw createError({
-            statusCode: 400,
-            message: 'Email и пароль обязательны',
+            statusCode: 404,
+            message: 'email и password обязательны.',
         });
     }
 
-    if (email_hse_student_check(body.email) !== true) {
+    const emailCheck = email_hse_student_check(body.email);
+    if (emailCheck !== true) {
         throw createError({
             statusCode: 400,
-            message: email_hse_student_check(body.email),
+            message: typeof emailCheck === 'string' ? emailCheck : 'Неверный формат email',
         });
     }
 
     try {
-        console.log('Отправка запроса к Directus:', `${config.DIRECTUS_URL}/auth/login`);
+        console.log('Отправка запроса к бэкенду:', `${config.AUTH_BACKEND_URL}/api/v1/users/login`);
         
-        const backendResponse = await fetch(`${config.DIRECTUS_URL}/auth/login`, {
+        const backendResponse = await fetch(`${config.AUTH_BACKEND_URL}/api/v1/users/login`, {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                email: body.email,
-                password: body.password
-            }),
+            body: JSON.stringify(body),
         });
 
-        console.log('Статус ответа от Directus:', backendResponse.status);
+        console.log('Статус ответа от бэкенда:', backendResponse.status);
 
+        // Получаем JSON-данные из ответа бэкенда
         const data = await backendResponse.json();
-        console.log('Ответ от Directus:', data);
+        console.log('Ответ от бэкенда:', data);
 
         if (!backendResponse.ok) {
-            const errorMessage = data.errors?.[0]?.message || data.message || 'Неизвестная ошибка';
-            console.error('Ошибка авторизации:', errorMessage);
+            // Предположим, что бэкенд в случае ошибки возвращает JSON вида:
+            // { "detail": "Email не найден." } или { "detail": "Неверный пароль." }
+            const detail = data.detail || data.message || 'Неизвестная ошибка';
 
-            if (errorMessage.includes('Invalid user credentials')) {
-                throw createError({
-                    statusCode: 401,
-                    message: 'Неверный email или пароль',
-                });
-            } else if (errorMessage.includes('User not found')) {
+            console.error('Ошибка авторизации:', detail);
+
+            // Сравниваем с нужными сообщениями
+            if (detail.includes('Email не найден') || detail.includes('User not found')) {
                 throw createError({
                     statusCode: 404,
-                    message: 'Пользователь не найден',
+                    message: 'Email не найден.',
                 });
-            } else if (errorMessage.includes('User not verified')) {
+            } else if (detail.includes('Неверный пароль') || detail.includes('Invalid credentials')) {
+                throw createError({
+                    statusCode: 403,
+                    message: 'Неверный пароль.',
+                });
+            } else if (detail.includes('Пользователь не подтвержден') || detail.includes('User not verified')) {
                 throw createError({
                     statusCode: 401,
-                    message: 'Пользователь не подтвержден',
+                    message: 'Пользователь не подтвержден.',
                 });
             } else {
+                // Если ошибка какая-то другая
                 throw createError({
                     statusCode: backendResponse.status,
-                    message: errorMessage,
+                    message: detail,
                 });
             }
         }
 
-        // Проверяем наличие токенов в ответе
-        if (!data.data?.access_token || !data.data?.refresh_token) {
-            console.error('Отсутствуют токены в ответе:', data);
-            throw createError({
-                statusCode: 500,
-                message: 'Ошибка при получении токенов',
-            });
+        // Читаем Set-Cookie из заголовков бэкенда
+        const setCookie = backendResponse.headers.get('set-cookie');
+        if (setCookie) {
+            // Устанавливаем cookie в ответ Nuxt-сервера
+            event.node.res.setHeader('Set-Cookie', setCookie);
         }
 
-        return {
-            data: {
-                access_token: data.data.access_token,
-                refresh_token: data.data.refresh_token
-            }
-        };
+        // Возвращаем тело ответа (JSON) обратно на фронтенд
+        return data;
     } catch (error: any) {
         console.error('Ошибка при входе:', error);
         
         if (error.statusCode) {
-            throw error;
+            throw error; // Просто пробрасываем дальше
         }
 
+        // Иначе это похоже на сетевую или другую непредвиденную ошибку
         throw createError({
             statusCode: 500,
             message: error.message || 'Ошибка при обращении к серверу авторизации',
+            cause: error,
         });
     }
 });
