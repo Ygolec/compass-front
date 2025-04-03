@@ -7,8 +7,6 @@
           <h1 class="text-h4">Файлы переселения</h1>
         </div>
 
-        <!-- Временно отключаем проверку авторизации -->
-        <!-- 
         <v-alert
           v-if="!authStore.isAuthenticated"
           type="warning"
@@ -20,14 +18,12 @@
 
         <v-alert
           v-else-if="!authStore.canAccessFiles"
-          type="warning"
+          type="error"
           variant="tonal"
           class="mb-4"
         >
-          У вас нет прав для просмотра и скачивания файлов переселения. 
-          Необходимы права администратора, менеджера или координатора.
+          У вас нет прав для доступа к файлам переселения
         </v-alert>
-        -->
 
         <v-progress-circular
           v-if="loading"
@@ -61,26 +57,22 @@ const authStore = useAuthStore();
 const loading = ref(false);
 const error = ref<string | null>(null);
 
-// Временно отключаем middleware
-// definePageMeta({
-//   middleware: ['auth']
-// });
+definePageMeta({
+  middleware: ['auth']
+});
 
 onMounted(async () => {
-  // Временно отключаем проверку прав
-  // if (authStore.isAuthenticated && authStore.canAccessFiles) {
-    loading.value = true;
-    try {
-      // Проверяем, что пользователь действительно имеет доступ
-      // await authStore.fetchCurrentUser();
-      // Задержка для имитации загрузки
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    } catch (e: any) {
-      error.value = e.message || 'Ошибка при проверке прав доступа';
-    } finally {
-      loading.value = false;
-    }
-  // }
+  loading.value = true;
+  try {
+    // Проверяем, что пользователь действительно имеет доступ
+    // await authStore.fetchCurrentUser();
+    // Задержка для имитации загрузки
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  } catch (e: any) {
+    error.value = e.message || 'Ошибка при проверке прав доступа';
+  } finally {
+    loading.value = false;
+  }
 });
 </script>
 

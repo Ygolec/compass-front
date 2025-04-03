@@ -67,6 +67,13 @@ declare module 'file-saver';
                 <v-card-title class="text-subtitle-1">
                   <v-icon class="mr-2">mdi-swap-horizontal</v-icon>
                   Переселение #{{ index + 1 }}
+                  <v-chip
+                    :color="relocation.type === 'internal' ? 'success' : 'warning'"
+                    size="small"
+                    class="ml-2"
+                  >
+                    {{ relocation.type === 'internal' ? 'Внутреннее' : 'Внешнее' }}
+                  </v-chip>
                 </v-card-title>
                 <v-card-text>
                   <v-list density="compact">
@@ -108,7 +115,7 @@ declare module 'file-saver';
                     color="primary"
                     variant="tonal"
                     prepend-icon="mdi-file-document"
-                    @click="downloadDOCX(relocation.from, relocation.to)"
+                    @click="downloadDOCX(relocation.from, relocation.to, relocation.type)"
                   >
                     Скачать документы
                   </v-btn>
@@ -156,9 +163,12 @@ interface ToUser {
   roomTo: string;
 }
 
+type RelocationType = 'internal' | 'external';
+
 interface RelocationData {
   from: FromUser;
   to: ToUser;
+  type: RelocationType;
 }
 
 interface Relocations {
@@ -175,25 +185,35 @@ onMounted(() => {
 });
 
 async function fetchRelocations() {
-  // Временно отключаем проверку прав
-  // if (!authStore.canAccessFiles) {
-  //   error.value = 'У вас нет прав для получения файлов переселения';
-  //   return;
-  // }
-
   loading.value = true;
   error.value = null;
   try {
+    if (!authStore.access_token) {
+      error.value = 'Необходима авторизация для получения данных о переселениях';
+      return;
+    }
+
+    if (!authStore.canAccessFiles) {
+      error.value = 'У вас нет прав для получения файлов переселения';
+      return;
+    }
+
+    console.log('Попытка получения файлов переселения. Роль пользователя:', authStore.user?.role);
+
     const response = await $fetch('/api/get_relocations/get_relocation_files', {
       method: 'POST',
       body: {
-        // Временно используем тестовый токен, если пользователь не авторизован
-        access_token: authStore.access_token || 'test_token'
+        access_token: authStore.access_token
       }
     });
     
     if (!response || !Array.isArray(response)) {
       throw new Error('Некорректный формат данных от сервера');
+    }
+
+    if (response.length === 0) {
+      error.value = 'Нет доступных переселений для скачивания';
+      return;
     }
 
     relocations.value = response.reduce((acc: Relocations, item: any) => {
@@ -230,9 +250,13 @@ async function fetchRelocations() {
         roomTo: item.relocation_applications_id_to?.room_number || 'Не указан',
       };
 
-      const relocationData = {
+      // Определяем тип переселения
+      const type: RelocationType = from.accommodationFrom === to.accommodationTo ? 'internal' : 'external';
+
+      const relocationData: RelocationData = {
         from,
         to,
+        type
       };
 
       if (!acc[groupName]) {
@@ -244,6 +268,7 @@ async function fetchRelocations() {
     }, {});
   } catch (err: any) {
     console.error('Ошибка при получении данных:', err);
+    console.error('Роль пользователя при ошибке:', authStore.user?.role);
     
     if (err.response?.status === 503) {
       error.value = 'Сервер Directus недоступен. Пожалуйста, попробуйте позже.';
@@ -267,80 +292,127 @@ function formatGroupName(groupName: string): string {
   return groupName.replace(/<\/?p>/g, '');
 }
 
-async function generateDOCX(from: FromUser, to: ToUser, isFrom = true) {
+async function generateDOCX(from: FromUser, to: ToUser, type: 'internal' | 'external', isFrom = true) {
   const user = isFrom ? from : to;
   const accommodationFrom = isFrom ? from.accommodationFrom : to.accommodationTo;
   const addressFrom = isFrom ? from.addressFrom : to.addressTo;
   const apartmentFrom = isFrom ? from.apartmentFrom : to.apartmentTo;
   const roomFrom = isFrom ? from.roomFrom : to.roomTo;
 
+  const paragraphs = [
+    new Paragraph({
+      text: "Заявление на переселение",
+      heading: "Heading1",
+      alignment: "center"
+    }),
+    new Paragraph({
+      text: type === 'internal' 
+        ? `Я, ${user.fullName}, прошу переселить меня из комнаты ${roomFrom} в квартире ${apartmentFrom} в комнату ${isFrom ? to.roomTo : from.roomFrom} в квартире ${isFrom ? to.apartmentTo : from.apartmentFrom} в том же общежитии "${accommodationFrom}".`
+        : `Я, ${user.fullName}, прошу переселить меня из общежития "${accommodationFrom}", расположенного по адресу ${addressFrom}, квартира ${apartmentFrom}, комната ${roomFrom}.`,
+      alignment: "justify"
+    }),
+    new Paragraph({ text: " " }),
+    new Paragraph({ text: "Данные о студенте:", heading: "Heading2" }),
+    new Paragraph(`ФИО: ${user.fullName}`),
+    new Paragraph(`Почта: ${user.email}`),
+    new Paragraph(`Телефон: ${user.phone}`),
+    new Paragraph(`Telegram: ${user.telegram}`),
+  ];
+
+  if (type === 'external') {
+    paragraphs.push(
+      new Paragraph({ text: " " }),
+      new Paragraph({ text: "Данные о новом размещении:", heading: "Heading2" }),
+      new Paragraph(`Общежитие: ${isFrom ? to.accommodationTo : from.accommodationFrom}`),
+      new Paragraph(`Адрес: ${isFrom ? to.addressTo : from.addressFrom}`),
+      new Paragraph(`Квартира: ${isFrom ? to.apartmentTo : from.apartmentFrom}`),
+      new Paragraph(`Комната: ${isFrom ? to.roomTo : from.roomFrom}`)
+    );
+  }
+
   return new Document({
     sections: [
       {
         properties: {},
-        children: [
-          new Paragraph({ text: "Заявление на переселение", heading: "Heading1" }),
-          new Paragraph({ text: `Я, ${user.fullName}, прошу переселить меня из общежития "${accommodationFrom}", расположенного по адресу ${addressFrom}, квартира ${apartmentFrom}, комната ${roomFrom}.`, alignment: "left" }),
-          new Paragraph(" "),
-          new Paragraph({ text: "Данные о студенте:", heading: "Heading2" }),
-          new Paragraph(`ФИО: ${user.fullName}`),
-          new Paragraph(`Почта: ${user.email}`),
-          new Paragraph(`Телефон: ${user.phone}`),
-          new Paragraph(`Telegram: ${user.telegram}`),
-        ],
+        children: paragraphs
       },
     ],
   });
 }
 
-async function downloadDOCX(from: FromUser, to: ToUser) {
-  // Временно отключаем проверку прав
-  // if (!authStore.canAccessFiles) {
-  //   error.value = 'У вас нет прав для скачивания файлов переселения';
-  //   return;
-  // }
+async function downloadDOCX(from: FromUser, to: ToUser, type: 'internal' | 'external') {
+  if (!authStore.canAccessFiles) {
+    error.value = 'У вас нет прав для скачивания файлов переселения';
+    return;
+  }
 
-  const docFrom = await generateDOCX(from, to, true);
-  const docTo = await generateDOCX(from, to, false);
+  console.log('Попытка скачивания файлов переселения. Роль пользователя:', authStore.user?.role);
+  console.log('Тип переселения:', type);
+  console.log('От:', from.fullName);
+  console.log('Кому:', to.fullName);
+
+  const docFrom = await generateDOCX(from, to, type, true);
+  const docTo = await generateDOCX(from, to, type, false);
 
   const blobFrom = await Packer.toBlob(docFrom);
   const blobTo = await Packer.toBlob(docTo);
 
-  saveAs(blobFrom, `Заявление_отправителя_${from.fullName}_${to.fullName}.docx`);
-  saveAs(blobTo, `Заявление_получателя_${from.fullName}_${to.fullName}.docx`);
+  const typeLabel = type === 'internal' ? 'внутреннее' : 'внешнее';
+  saveAs(blobFrom, `Заявление_отправителя_${typeLabel}_${from.fullName}_${to.fullName}.docx`);
+  saveAs(blobTo, `Заявление_получателя_${typeLabel}_${from.fullName}_${to.fullName}.docx`);
 }
 
 async function downloadGroupDOCX(groupName: string) {
-  // Временно отключаем проверку прав
-  // if (!authStore.canAccessFiles) {
-  //   error.value = 'У вас нет прав для скачивания файлов переселения';
-  //   return;
-  // }
+  if (!authStore.canAccessFiles) {
+    error.value = 'У вас нет прав для скачивания файлов переселения';
+    return;
+  }
+
+  console.log('Попытка скачивания группы файлов переселения. Роль пользователя:', authStore.user?.role);
+  console.log('Группа:', groupName);
 
   const group = relocations.value[groupName];
+  const paragraphs = [
+    new Paragraph({
+      text: `Заявления на переселение: ${formatGroupName(groupName)}`,
+      heading: "Heading1",
+      alignment: "center"
+    }),
+  ];
+
+  for (const [index, { from, to, type }] of group.entries()) {
+    const typeLabel = type === 'internal' ? 'внутреннее' : 'внешнее';
+    paragraphs.push(
+      new Paragraph({ text: `Заявление на переселение #${index + 1} (${typeLabel}):`, heading: "Heading2" }),
+      new Paragraph({ text: `${from.fullName} ↔ ${to.fullName}`, heading: "Heading3" }),
+      new Paragraph(" "),
+      new Paragraph({ text: "Данные о переселении:", heading: "Heading3" }),
+      new Paragraph(`ФИО отправителя: ${from.fullName}`),
+      new Paragraph(`Почта отправителя: ${from.email}`),
+      new Paragraph(`Телефон отправителя: ${from.phone}`),
+      new Paragraph(`Telegram отправителя: ${from.telegram}`),
+      new Paragraph(" "),
+      new Paragraph(`ФИО получателя: ${to.fullName}`),
+      new Paragraph(`Почта получателя: ${to.email}`),
+      new Paragraph(`Телефон получателя: ${to.phone}`),
+      new Paragraph(`Telegram получателя: ${to.telegram}`),
+      new Paragraph(" "),
+      new Paragraph({
+        text: type === 'internal'
+          ? `Я, ${from.fullName}, прошу переселить меня из комнаты ${from.roomFrom} в квартире ${from.apartmentFrom} в комнату ${to.roomTo} в квартире ${to.apartmentTo} в том же общежитии "${from.accommodationFrom}".`
+          : `Я, ${from.fullName}, прошу переселить меня из общежития "${from.accommodationFrom}", расположенного по адресу ${from.addressFrom}, квартира ${from.apartmentFrom}, комната ${from.roomFrom}, в общежитие "${to.accommodationTo}", расположенное по адресу ${to.addressTo}, квартира ${to.apartmentTo}, комната ${to.roomTo}.`,
+        alignment: "justify"
+      }),
+      new Paragraph("------------------------------------------------------------"),
+      new Paragraph(" "),
+    );
+  }
+
   const doc = new Document({
     sections: [
       {
         properties: {},
-        children: group.flatMap(({ from, to }, index) => [
-          new Paragraph({ text: `Заявление на переселение #${index + 1}:`, heading: "Heading1" }),
-          new Paragraph({ text: `${from.fullName} (из ${from.accommodationFrom}) ↔ ${to.fullName} (в ${to.accommodationTo})`, heading: "Heading2" }),
-          new Paragraph(" "),
-          new Paragraph({ text: "Данные о переселении:", heading: "Heading2" }),
-          new Paragraph(`ФИО отправителя: ${from.fullName}`),
-          new Paragraph(`Почта отправителя: ${from.email}`),
-          new Paragraph(`Телефон отправителя: ${from.phone}`),
-          new Paragraph(`Telegram отправителя: ${from.telegram}`),
-          new Paragraph(" "),
-          new Paragraph(`ФИО получателя: ${to.fullName}`),
-          new Paragraph(`Почта получателя: ${to.email}`),
-          new Paragraph(`Телефон получателя: ${to.phone}`),
-          new Paragraph(`Telegram получателя: ${to.telegram}`),
-          new Paragraph(" "),
-          new Paragraph(`Я, ${from.fullName}, прошу переселить меня из общежития "${from.accommodationFrom}", расположенного по адресу ${from.addressFrom}, квартира ${from.apartmentFrom}, комната ${from.roomFrom}, в общежитие "${to.accommodationTo}", расположенное по адресу ${to.addressTo}, квартира ${to.apartmentTo}, комната ${to.roomTo}.`),
-          new Paragraph("------------------------------------------------------------"),
-          new Paragraph(" "),
-        ]),
+        children: paragraphs
       },
     ],
   });
@@ -350,11 +422,12 @@ async function downloadGroupDOCX(groupName: string) {
 }
 
 async function downloadAllDOCX() {
-  // Временно отключаем проверку прав
-  // if (!authStore.canAccessFiles) {
-  //   error.value = 'У вас нет прав для скачивания файлов переселения';
-  //   return;
-  // }
+  if (!authStore.canAccessFiles) {
+    error.value = 'У вас нет прав для скачивания файлов переселения';
+    return;
+  }
+
+  console.log('Попытка скачивания всех файлов переселения. Роль пользователя:', authStore.user?.role);
 
   const allGroups = Object.entries(relocations.value);
   

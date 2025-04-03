@@ -60,8 +60,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { email_hse_student_check as emailHseStudentCheck, required } from "~/utils/rules";
+import { useAuthStore } from "~/stores/auth_store";
 
 const sportsList = ref(["Футбол", "Баскетбол", "Теннис", "Плавание", "Бег", "Волейбол", "Лыжи", "Тренажерный зал"]);
 const hobbiesList = ref(["Чтение", "Музыка", "Спорт", "Рисование", "Программирование"]);
@@ -127,6 +128,23 @@ const isFormValid = computed(() => {
       anketaData.value.russianProficiency &&
       anketaData.value.englishProficiency &&
       anketaData.value.roomStyle;
+});
+
+const authStore = useAuthStore();
+const loading = ref(false);
+const error = ref<string | null>(null);
+
+// Проверяем только авторизацию при монтировании компонента
+onMounted(async () => {
+  loading.value = true;
+  try {
+    // Проверяем, что пользователь авторизован
+    await authStore.fetchCurrentUser();
+  } catch (e: any) {
+    error.value = e.message || 'Ошибка при проверке авторизации';
+  } finally {
+    loading.value = false;
+  }
 });
 
 const submitForm = async () => {

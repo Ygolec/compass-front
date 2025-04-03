@@ -18,16 +18,18 @@ interface UserApiResponse {
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        access_token: '' as string | null,
+        access_token: null as string | null,
         user: null as User | null,
     }),
 
     getters: {
         isAuthenticated: (state) => !!state.access_token,
         canAccessFiles: (state) => {
-            if (!state.user || !state.user.role) return false;
-            const allowedRoles = ['admin', 'manager', 'coordinator', 'administrator'];
-            return allowedRoles.includes(state.user.role.toLowerCase());
+            if (!state.user) return false;
+            return ['admin', 'manager', 'coordinator'].includes(state.user.role);
+        },
+        canAccessAnketa: (state) => {
+            return !!state.access_token;
         }
     },
 
