@@ -39,7 +39,7 @@
             <v-card-actions>
               <v-btn
                 color="primary"
-                to="/relocations"
+                to="/relocation"
                 prepend-icon="mdi-swap-horizontal"
               >
                 Перейти к переселениям

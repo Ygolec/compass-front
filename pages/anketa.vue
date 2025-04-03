@@ -4,7 +4,7 @@
       <v-col cols="12">
         <div class="d-flex align-center mb-6">
           <v-icon icon="mdi-clipboard-list" size="32" class="mr-3" color="primary"/>
-          <h1 class="text-h4">Анкета для переселения</h1>
+          <h1 class="text-h4">Анкета для заселения</h1>
         </div>
 
         <v-alert
@@ -43,7 +43,6 @@
         </v-alert>
 
         <v-card v-else>
-          <v-card-title class="text-h5 mb-4">Анкета для заселения</v-card-title>
           <v-card-text>
             <AnketaDialogue />
           </v-card-text>

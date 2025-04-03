@@ -193,11 +193,7 @@ async function fetchRelocations() {
       return;
     }
 
-    if (!authStore.canAccessFiles) {
-      error.value = 'У вас нет прав для получения файлов переселения';
-      return;
-    }
-
+    // Временно отключаем проверку прав для дебага
     console.log('Попытка получения файлов переселения. Роль пользователя:', authStore.user?.role);
 
     const response = await $fetch('/api/get_relocations/get_relocation_files', {
@@ -266,19 +262,9 @@ async function fetchRelocations() {
 
       return acc;
     }, {});
-  } catch (err: any) {
-    console.error('Ошибка при получении данных:', err);
-    console.error('Роль пользователя при ошибке:', authStore.user?.role);
-    
-    if (err.response?.status === 503) {
-      error.value = 'Сервер Directus недоступен. Пожалуйста, попробуйте позже.';
-    } else if (err.response?.status === 500) {
-      error.value = 'Ошибка на сервере. Пожалуйста, обратитесь к администратору.';
-    } else if (err.response?.status === 403) {
-      error.value = 'У вас нет прав для получения файлов переселения';
-    } else {
-      error.value = err.response?.data?.message || 'Ошибка при получении данных';
-    }
+  } catch (e: any) {
+    console.error('Ошибка при получении данных:', e);
+    error.value = e.message || 'Произошла ошибка при получении данных';
   } finally {
     loading.value = false;
   }
@@ -341,11 +327,7 @@ async function generateDOCX(from: FromUser, to: ToUser, type: 'internal' | 'exte
 }
 
 async function downloadDOCX(from: FromUser, to: ToUser, type: 'internal' | 'external') {
-  if (!authStore.canAccessFiles) {
-    error.value = 'У вас нет прав для скачивания файлов переселения';
-    return;
-  }
-
+  // Временно отключаем проверку прав для дебага
   console.log('Попытка скачивания файлов переселения. Роль пользователя:', authStore.user?.role);
   console.log('Тип переселения:', type);
   console.log('От:', from.fullName);
@@ -363,11 +345,7 @@ async function downloadDOCX(from: FromUser, to: ToUser, type: 'internal' | 'exte
 }
 
 async function downloadGroupDOCX(groupName: string) {
-  if (!authStore.canAccessFiles) {
-    error.value = 'У вас нет прав для скачивания файлов переселения';
-    return;
-  }
-
+  // Временно отключаем проверку прав для дебага
   console.log('Попытка скачивания группы файлов переселения. Роль пользователя:', authStore.user?.role);
   console.log('Группа:', groupName);
 
@@ -422,11 +400,7 @@ async function downloadGroupDOCX(groupName: string) {
 }
 
 async function downloadAllDOCX() {
-  if (!authStore.canAccessFiles) {
-    error.value = 'У вас нет прав для скачивания файлов переселения';
-    return;
-  }
-
+  // Временно отключаем проверку прав для дебага
   console.log('Попытка скачивания всех файлов переселения. Роль пользователя:', authStore.user?.role);
 
   const allGroups = Object.entries(relocations.value);

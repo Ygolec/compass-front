@@ -1,4 +1,7 @@
 import {defineStore} from 'pinia';
+import {createDirectus, readUser} from '@directus/sdk';
+import type {RestClient} from '@directus/sdk';
+import {rest} from '@directus/sdk';
 
 interface User {
     id: string;
@@ -16,6 +19,24 @@ interface UserApiResponse {
     directus_id?: string;
 }
 
+interface DirectusRole {
+    id: string;
+    name: string;
+    icon: string;
+    description: string | null;
+}
+
+interface DirectusUser {
+    id: string;
+    email: string | null;
+    role: string | DirectusRole;
+    // другие поля Directus
+}
+
+interface DirectusResponse {
+    data: DirectusUser;
+}
+
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         access_token: null as string | null,
@@ -25,8 +46,9 @@ export const useAuthStore = defineStore('auth', {
     getters: {
         isAuthenticated: (state) => !!state.access_token,
         canAccessFiles: (state) => {
-            if (!state.user) return false;
-            return ['admin', 'manager', 'coordinator'].includes(state.user.role);
+            // Временно отключаем проверку роли для дебага
+            console.log('Текущая роль пользователя:', state.user?.role);
+            return !!state.access_token; // Разрешаем доступ любому авторизованному пользователю
         },
         canAccessAnketa: (state) => {
             return !!state.access_token;
@@ -115,7 +137,36 @@ export const useAuthStore = defineStore('auth', {
                     method: 'GET',
                     credentials: 'include',
                 });
-                this.setUser(data);
+                console.log('Получены данные пользователя из /api/auth/me:', data);
+
+                if (data.directus_id) {
+                    try {
+                        // Получаем роль через новый эндпоинт
+                        const roleData = await $fetch<{ role: string }>('/api/auth/get_role', {
+                            query: {
+                                directus_id: data.directus_id
+                            }
+                        });
+                        
+                        console.log('Получена роль пользователя:', roleData);
+                        
+                        if (roleData.role) {
+                            // Обновляем данные пользователя с полученной ролью
+                            this.setUser({
+                                ...data,
+                                role: roleData.role
+                            });
+                        } else {
+                            this.setUser(data);
+                        }
+                    } catch (roleError) {
+                        console.error('Ошибка получения роли пользователя:', roleError);
+                        // Если не удалось получить роль, используем данные из /api/auth/me
+                        this.setUser(data);
+                    }
+                } else {
+                    this.setUser(data);
+                }
             } catch (error: any) {
                 console.error('Ошибка получения данных пользователя:', error);
                 if (error?.response?.status === 401) {

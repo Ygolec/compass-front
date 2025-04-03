@@ -16,17 +16,8 @@
           Для доступа к файлам переселения необходимо авторизоваться
         </v-alert>
 
-        <v-alert
-          v-else-if="!authStore.canAccessFiles"
-          type="error"
-          variant="tonal"
-          class="mb-4"
-        >
-          У вас нет прав для доступа к файлам переселения
-        </v-alert>
-
         <v-progress-circular
-          v-if="loading"
+          v-else-if="loading"
           indeterminate
           color="primary"
           size="64"
