@@ -1,4 +1,4 @@
-import { createDirectus, rest, readUser } from '@directus/sdk';
+import { createDirectus, rest, readUser, staticToken } from '@directus/sdk';
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
@@ -19,9 +19,21 @@ export default defineEventHandler(async (event) => {
         });
     }
 
+    if (!config.DIRECTUS_TOKEN) {
+        throw createError({
+            statusCode: 500,
+            message: 'DIRECTUS_TOKEN is not configured'
+        });
+    }
+
     try {
-        const client = createDirectus(config.DIRECTUS_URL).with(rest());
+        console.log('Запрашиваем роль для пользователя:', directus_id);
+        const client = createDirectus(config.DIRECTUS_URL)
+            .with(staticToken(config.DIRECTUS_TOKEN))
+            .with(rest());
+            
         const user = await client.request(readUser(directus_id));
+        console.log('Получены данные пользователя из Directus:', user);
 
         if (!user) {
             throw createError({
@@ -32,6 +44,7 @@ export default defineEventHandler(async (event) => {
 
         // Определяем роль
         const role = typeof user.role === 'string' ? user.role : user.role?.name;
+        console.log('Определена роль пользователя:', role);
 
         if (!role) {
             throw createError({

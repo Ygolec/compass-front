@@ -12,6 +12,14 @@ const authStore = useAuthStore();
         <v-btn href="/">Compass</v-btn>
         <v-btn
           v-if="authStore.isAuthenticated"
+          to="/relocation"
+          color="primary"
+          variant="text"
+        >
+          Переселения
+        </v-btn>
+        <v-btn
+          v-if="authStore.isAuthenticated"
           to="/relocation-files"
           color="primary"
           variant="text"

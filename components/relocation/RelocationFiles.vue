@@ -1,6 +1,13 @@
 // Добавляем объявление типа для file-saver
 declare module 'file-saver';
 
+interface DirectusRole {
+  id: string;
+  name: string;
+  icon: string;
+  description: string | null;
+}
+
 <template>
   <div>
     <v-card v-if="relocations && Object.keys(relocations).length" class="mb-4">
@@ -179,10 +186,59 @@ const authStore = useAuthStore();
 const relocations = ref<Relocations>({});
 const loading = ref(false);
 const error = ref<string | null>(null);
+const canDownloadFiles = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
+  await checkUserRole();
   fetchRelocations();
 });
+
+async function checkUserRole() {
+  try {
+    // Сначала проверяем, загружены ли данные пользователя
+    if (!authStore.user) {
+      console.log('Загружаем данные пользователя...');
+      await authStore.fetchCurrentUser();
+    }
+
+    console.log('Данные пользователя:', authStore.user);
+    const userRole = authStore.user?.role as string | DirectusRole;
+    console.log('Текущая роль пользователя:', userRole);
+    
+    if (!userRole) {
+      console.error('Роль пользователя не определена');
+      error.value = 'Ошибка при проверке прав доступа: роль пользователя не определена';
+      return;
+    }
+    
+    // Проверяем роль пользователя, учитывая что она может быть как строкой, так и объектом
+    const roleName = typeof userRole === 'string' ? userRole : userRole.name;
+    console.log('Имя роли:', roleName);
+    
+    if (!roleName) {
+      console.error('Имя роли не определено');
+      error.value = 'Ошибка при проверке прав доступа: имя роли не определено';
+      return;
+    }
+    
+    // Проверяем, является ли пользователь администратором, менеджером общежитий или администратором общежития
+    // Учитываем возможные варианты написания ролей в Directus
+    const allowedRoles = [
+      'Administrator', '48db2cf1-656d-4f8a-abb2-97add6206f7e',
+      'Dormitory Manager', '0f96c7fc-56f0-4834-8346-314273a98c7e',
+    ];
+    
+    canDownloadFiles.value = allowedRoles.includes(roleName);
+    console.log('Доступ к файлам:', canDownloadFiles.value ? 'разрешен' : 'запрещен');
+    
+    if (!canDownloadFiles.value) {
+      error.value = 'У вас нет прав для скачивания файлов. Требуется роль администратора, менеджера общежитий или администратора общежития.';
+    }
+  } catch (e) {
+    console.error('Ошибка при проверке роли:', e);
+    error.value = 'Ошибка при проверке прав доступа';
+  }
+}
 
 async function fetchRelocations() {
   loading.value = true;
@@ -193,8 +249,10 @@ async function fetchRelocations() {
       return;
     }
 
-    // Временно отключаем проверку прав для дебага
-    console.log('Попытка получения файлов переселения. Роль пользователя:', authStore.user?.role);
+    if (!canDownloadFiles.value) {
+      error.value = 'У вас нет прав для скачивания файлов';
+      return;
+    }
 
     const response = await $fetch('/api/get_relocations/get_relocation_files', {
       method: 'POST',
@@ -327,7 +385,11 @@ async function generateDOCX(from: FromUser, to: ToUser, type: 'internal' | 'exte
 }
 
 async function downloadDOCX(from: FromUser, to: ToUser, type: 'internal' | 'external') {
-  // Временно отключаем проверку прав для дебага
+  if (!canDownloadFiles.value) {
+    error.value = 'У вас нет прав для скачивания файлов';
+    return;
+  }
+
   console.log('Попытка скачивания файлов переселения. Роль пользователя:', authStore.user?.role);
   console.log('Тип переселения:', type);
   console.log('От:', from.fullName);
@@ -345,7 +407,11 @@ async function downloadDOCX(from: FromUser, to: ToUser, type: 'internal' | 'exte
 }
 
 async function downloadGroupDOCX(groupName: string) {
-  // Временно отключаем проверку прав для дебага
+  if (!canDownloadFiles.value) {
+    error.value = 'У вас нет прав для скачивания файлов';
+    return;
+  }
+
   console.log('Попытка скачивания группы файлов переселения. Роль пользователя:', authStore.user?.role);
   console.log('Группа:', groupName);
 
@@ -400,7 +466,11 @@ async function downloadGroupDOCX(groupName: string) {
 }
 
 async function downloadAllDOCX() {
-  // Временно отключаем проверку прав для дебага
+  if (!canDownloadFiles.value) {
+    error.value = 'У вас нет прав для скачивания файлов';
+    return;
+  }
+
   console.log('Попытка скачивания всех файлов переселения. Роль пользователя:', authStore.user?.role);
 
   const allGroups = Object.entries(relocations.value);
