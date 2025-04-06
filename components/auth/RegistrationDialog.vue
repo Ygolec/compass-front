@@ -17,7 +17,7 @@
               <v-text-field
                   label="Email с доменом @edu.hse.ru"
                   prepend-icon="mdi-account"
-                  placeholder="tes@edu.hse.ru"
+                  placeholder="test@edu.hse.ru"
                   :rules="[required,email_hse_student_check]"
                   v-model="email"
                   type="text"
@@ -50,12 +50,12 @@
             </v-card-actions>
           </v-form>
         </v-window-item>
-        <v-window-item :value="2">
+        <v-window-item :value="1">
           <div class="pa-4 text-center">
             <v-fab
-                class="mt-4"
+                class="mt-6 ml-2"
                 icon="mdi-chevron-left"
-                location="bottom start"
+                location="top start"
                 size="small"
                 absolute
                 offset
@@ -89,7 +89,7 @@ const password = ref<string>('');
 const password_repeat = ref<string>('');
 const loading = ref<boolean>(false);
 const serverEmailError = ref<string>('');
-const registration_step = ref<number>(0);
+const registration_step = ref<number>(1);
 const confirm_password = password_confirm(password);
 const register = async () => {
   loading.value = true;

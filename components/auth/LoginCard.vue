@@ -1,5 +1,6 @@
 <template>
   <RegistrationDialog :dialog="registration_dialog" @update:dialog="registration_dialog = $event"/>
+  <ForgotPasswordDialog :dialog="forgot_dialog" @update:dialog="forgot_dialog = $event"/>
   <v-container>
     <v-card
         class="mx-auto my-auto w-90"
@@ -25,6 +26,14 @@
               type="password"
               :error-messages="serverPasswordError ? [serverPasswordError] : serverVerifiedError ? [serverVerifiedError] : []"
           ></v-text-field>
+          <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-end">
+            <a
+                class="text-caption text-decoration-none text-blue"
+                rel="noopener noreferrer"
+                @click="forgot_dialog = true"
+            >
+              Забыли пароль?</a>
+          </div>
         </v-card-text>
         <v-card-actions>
           <v-container>
@@ -53,12 +62,14 @@
 import {email_hse_student_check, required} from "~/utils/rules";
 import RegistrationDialog from "~/components/auth/RegistrationDialog.vue";
 import {useAuthStore} from "~/stores/auth_store";
+import ForgotPasswordDialog from "~/components/auth/ForgotPasswordDialog.vue";
 
 const authStore = useAuthStore();
 const email = ref<string>('');
 const password = ref<string>('');
 const loading = ref<boolean>(false);
 const registration_dialog = ref<boolean>(false);
+const forgot_dialog = ref<boolean>(false);
 const serverEmailError = ref<string>('');
 const serverPasswordError = ref<string>('');
 const serverVerifiedError = ref<string>('');

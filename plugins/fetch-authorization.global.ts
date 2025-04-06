@@ -2,41 +2,48 @@
 export default defineNuxtPlugin(() => {
     const authStore = useAuthStore();
 
-    // Перехватываем $fetch
     const _fetch = globalThis.$fetch;
     globalThis.$fetch = async (request, options = {}) => {
         if (!options.headers) {
             options.headers = {};
         }
-        // Если есть accessToken, добавляем Authorization
+
         if (authStore.access_token) {
             (options.headers as Record<string, string>)['Authorization'] =
                 `Bearer ${authStore.access_token}`;
         }
 
-        // А чтобы куки тоже отправлялись
         options.credentials = 'include';
 
-        let response;
         try {
-            response = await _fetch(request, options);
+            return await _fetch(request, options);
         } catch (error: any) {
+            const isUnauthorized = error?.response?.status === 401;
 
-            if (!authStore.access_token || error?.response?.status !== 401) {
+            // Добавляем защиту от бесконечного цикла
+            const isRefreshRequest = typeof request === 'string'
+                ? request.includes('/api/auth/refresh')
+                : false;
+
+            if (!authStore.access_token || !isUnauthorized || isRefreshRequest) {
                 throw error;
             }
-            // Если сервер вернул 401 — пробуем рефрешнуть
-            if (error?.response?.status === 401) {
-                // Пытаемся рефрешнуть
+
+            try {
+                // Пробуем обновить токен
                 await authStore.refreshAccessToken();
-                // Повторяем запрос с обновлённым токеном
+
+                // Обновляем заголовок
                 (options.headers as Record<string, string>)['Authorization'] =
                     `Bearer ${authStore.access_token}`;
-                response = await _fetch(request, options);
-            } else {
-                throw error;
+
+                // Повторяем оригинальный запрос
+                return await _fetch(request, options);
+            } catch (refreshError) {
+                // Рефреш не удался — выходим из аккаунта и пробрасываем ошибку
+                await authStore.logout(); // если у тебя есть такая функция
+                throw refreshError;
             }
         }
-        return response;
     };
 });

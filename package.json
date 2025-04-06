@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host 127.0.0.1 --port 80",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -27,8 +27,9 @@
     "nuxt-telegram-auth": "^1.2.0",
     "pinia": "^2.2.6",
     "tough-cookie": "^5.1.0",
-    "vue": "latest",
-    "vue-router": "latest"
+    "vue": "^3.5.13",
+    "vue-router": "latest",
+    "vue-yandex-maps": "^2.1.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
@@ -38,6 +39,7 @@
     "prisma": "^6.2.1",
     "sass-embedded": "^1.83.4",
     "vite-plugin-vuetify": "^2.0.4",
+    "vue-tsc": "^2.1.10",
     "vuetify": "^3.7.4"
   },
   "trustedDependencies": [
