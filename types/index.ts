@@ -132,5 +132,74 @@ declare global {
         ]
     }
 
+    export interface anketa_data {
+        lastName: string;
+        firstName: string;
+        middleName?: string;
+        birthDate: string;
+        facultyFullName: string;
+        facultyShortName: string;
+        course: number;
+        city: string;
+        sex: 'male' | 'female';
+        roomType: string;
+        preferredFloor: number | null;
+        hasChronicDiseases: boolean;
+        needsBenefitPlacement: boolean;
+        needsSpecialConditions: boolean;
+        phone: string;
+        email: string;
+        doSports: boolean;
+        sports: string[];
+        hasHobbies: boolean;
+        hobbies: string[];
+        boardGames: boolean;
+        russianProficiency: string;
+        englishProficiency: string;
+        roomStyle: string;
+        doSmoke: boolean;
+        earlyBird: boolean;
+        isForeigner: boolean;
+    }
+
+    export interface AnketaData {
+        lastName: string;
+        firstName: string;
+        middleName?: string;
+        birthDate: string;
+        facultyFullName: string;
+        facultyShortName: string;
+        course: number;
+        city: string;
+        sex: 'male' | 'female';
+        roomType: string;
+        preferredFloor: number | null;
+        hasChronicDiseases: boolean;
+        needsBenefitPlacement: boolean;
+        needsSpecialConditions: boolean;
+        phone: string;
+        email: string;
+        doSports: boolean;
+        sports: string[];
+        hasHobbies: boolean;
+        hobbies: string[];
+        boardGames: boolean;
+        russianProficiency: string;
+        englishProficiency: string;
+        roomStyle: string;
+        doSmoke: boolean;
+        earlyBird: boolean;
+        isForeigner: boolean;
+    }
+
+    export interface ApiError {
+        response?: {
+            status: number;
+            data?: {
+                message?: string;
+            };
+        };
+        message?: string;
+    }
 
 }
