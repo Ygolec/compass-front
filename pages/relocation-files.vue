@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import RelocationFiles from "~/components/relocation/RelocationFiles.vue";
-import { useAuthStore } from "~/stores/auth_store";
+import {useAuthStore} from "~/stores/auth_store";
 import { ref, onMounted } from 'vue';
 
 const authStore = useAuthStore();

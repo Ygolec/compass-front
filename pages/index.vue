@@ -1,5 +1,3 @@
-
-
 <template>
   <v-main
       class="main-container">
