@@ -16,14 +16,14 @@
           Для доступа к анкете необходимо авторизоваться
         </v-alert>
 
-        <v-alert
-          v-else-if="!authStore.canAccessAnketa"
-          type="error"
-          variant="tonal"
-          class="mb-4"
-        >
-          У вас нет прав для доступа к анкете
-        </v-alert>
+<!--        <v-alert-->
+<!--          v-else-if="!authStore.canAccessAnketa"-->
+<!--          type="error"-->
+<!--          variant="tonal"-->
+<!--          class="mb-4"-->
+<!--        >-->
+<!--          У вас нет прав для доступа к анкете-->
+<!--        </v-alert>-->
 
         <v-progress-circular
           v-if="loading"
@@ -57,12 +57,12 @@ import { useAuthStore } from '~/stores/auth_store';
 import AnketaDialogue from '~/components/anketa/AnketaDialogue.vue';
 import { ref, onMounted } from 'vue';
 
-const authStore = useAuthStore();
 const loading = ref(false);
 const error = ref<string | null>(null);
+const authStore = useAuthStore();
 
 definePageMeta({
-  middleware: ['auth']
+  // middleware: ['auth']
 });
 
 onMounted(async () => {

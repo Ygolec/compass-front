@@ -29,7 +29,9 @@
               </v-stepper-header>
               <v-stepper-window>
                 <SelectStep v-model:selected-accommodation="data.selectedAccommodation"/>
-                <FillStep v-model:content-of-accommodations="data.contentOfAccommodations"/>
+                <FillStep v-model:content-of-accommodations="data.contentOfAccommodations"
+                          :accommodations-type="data.selectedAccommodation.type_of_accommodation"
+                          v-model:content-of-accommodations-corridors="data.contentOfAccommodationsCorridors"/>
                 <CheckStep v-model:data="data"/>
               </v-stepper-window>
               <v-stepper-actions
@@ -57,6 +59,7 @@ const data = ref({
   selectedAccommodation: {
     accommodation_id: null,
     address_id: null,
+    type_of_accommodation: ''
   },
   contentOfAccommodations: {
     floors: [
@@ -78,6 +81,21 @@ const data = ref({
         ]
       }
     ]
+  },
+  contentOfAccommodationsCorridors: {
+    floors: [
+      {
+        gender: "М",
+        number: 1,
+        number_of_rooms: 1,
+        rooms: [
+          {
+            max_capacity: 1,
+            room_number: 1
+          }
+        ]
+      }
+    ]
   }
 })
 
@@ -95,6 +113,7 @@ async function send() {
     alert('Ошибка при создании общежития');
   }
 }
+
 function isAccommodationSelected() {
   return data.value.selectedAccommodation.accommodation_id !== null && data.value.selectedAccommodation.address_id !== null;
 }
@@ -110,12 +129,14 @@ function nextStep() {
   if (step.value === 2 && !isContentFilled()) {
     return;
   }
-  if (step.value===3){
-    // send();
+  if (step.value === 3) {
+    send();
+    step.value++;
     return;
   }
   step.value++;
 }
+
 function disabled() {
   return step.value === 1 || step.value === 4 ? 'prev' : step.value === 4 ? 'next' : undefined;
 }

@@ -30,11 +30,16 @@ const props = defineProps<{
   selectedAccommodation: {
     accommodation_id: string | null,
     address_id: string | null,
+    type_of_accommodation: string | null,
   }
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:selectedAccommodation', value: { accommodation_id: string | null, address_id: string | null }): void;
+  (e: 'update:selectedAccommodation', value: {
+    accommodation_id: string | null,
+    address_id: string | null,
+    type_of_accommodation: string | null
+  }): void;
 }>();
 
 const accommodationId = computed({
@@ -58,8 +63,29 @@ const addressId = computed({
   }
 });
 
+const typeOfAccommodation = computed({
+  get: () => props.selectedAccommodation.type_of_accommodation,
+  set: (val) => {
+    emit('update:selectedAccommodation', {
+      ...props.selectedAccommodation,
+      type_of_accommodation: val
+    });
+  }
+});
+
+watch(accommodationId, (newVal) => {
+  if (newVal) {
+    const selectedAccommodation = acc.value.find(acc => acc.id === newVal);
+    if (selectedAccommodation) {
+      typeOfAccommodation.value = selectedAccommodation.type.name;
+    }
+  } else {
+    typeOfAccommodation.value = null;
+  }
+})
+
 onMounted(async () => {
-  acc.value = await $fetch<student_accommodations_with_addresses[]>('/api/student_accommodation/list_of_accommodation');
+  acc.value = await $fetch<student_accommodations_with_addresses[]>('/api/admin/accommodation/list_of_accommodation');
 })
 
 const getAccommodationAddress = (id: string | null) => {

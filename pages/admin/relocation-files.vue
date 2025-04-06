@@ -49,7 +49,7 @@ const loading = ref(false);
 const error = ref<string | null>(null);
 
 definePageMeta({
-  middleware: ['auth']
+  // middleware: ['auth']
 });
 
 onMounted(async () => {
