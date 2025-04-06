@@ -1,7 +1,6 @@
 import vuetify, {transformAssetUrls} from 'vite-plugin-vuetify';
 import {process} from "std-env";
 
-const config = useRuntimeConfig();
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -14,7 +13,7 @@ export default defineNuxtConfig({
         DIRECTUS_TOKEN: '',
         AUTH_BACKEND_URL: '',
         TELEGRAM_TOKEN: '',
-        YANDEX_API_KEY: '',
+        YANDEX_API_KEY: process.env.YANDEX_API_KEY || '',
     },
     // runtimeConfig: {
     //     HSE_EMAIL: process.env.HSE_EMAIL,
@@ -34,7 +33,7 @@ export default defineNuxtConfig({
     modules: [// другие модули...
         '@pinia/nuxt', 'nuxt-telegram-auth', 'vue-yandex-maps/nuxt'],
     yandexMaps: {
-        apikey: config.YANDEX_API_KEY,
+        apikey: process.env.YANDEX_API_KEY || '',
     },
     vite: {
         vue: {
