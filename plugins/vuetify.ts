@@ -25,7 +25,6 @@ export default defineNuxtPlugin((app) => {
         },
         components: {
             VFileUpload,
-            VNumberInput,
         },
     })
     app.vueApp.use(vuetify)
