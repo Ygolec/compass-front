@@ -13,7 +13,6 @@ export default defineNuxtConfig({
         DIRECTUS_TOKEN: '',
         AUTH_BACKEND_URL: '',
         TELEGRAM_TOKEN: '',
-        YANDEX_API_KEY: process.env.YANDEX_API_KEY || '',
     },
     // runtimeConfig: {
     //     HSE_EMAIL: process.env.HSE_EMAIL,
@@ -33,7 +32,7 @@ export default defineNuxtConfig({
     modules: [// другие модули...
         '@pinia/nuxt', 'nuxt-telegram-auth', 'vue-yandex-maps/nuxt'],
     yandexMaps: {
-        apikey: process.env.YANDEX_API_KEY || '',
+        apikey: 'e1a6fad9-632c-4ed2-9f20-dd0cc990c444',
     },
     vite: {
         vue: {
