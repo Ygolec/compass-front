@@ -3,6 +3,18 @@
     <v-container>
       <v-row>
         <v-col cols="12">
+          <v-breadcrumbs>
+            <v-breadcrumbs-item
+            href="/admin"
+            title="Панель администрирования"
+            />
+            <v-breadcrumbs-divider/>
+            <v-breadcrumbs-item
+            href="/admin/accommodation/create"
+            title="Заполнение общежития"
+            :disabled="true"
+            />
+          </v-breadcrumbs>
           <v-sheet rounded="lg">
             <v-stepper v-model="step">
               <v-stepper-header>
@@ -25,14 +37,46 @@
                 <v-stepper-item
                     title="Готово"
                     :value="4"
-                ></v-stepper-item>
+                >
+                </v-stepper-item>
               </v-stepper-header>
               <v-stepper-window>
                 <SelectStep v-model:selected-accommodation="data.selectedAccommodation"/>
                 <FillStep v-model:content-of-accommodations="data.contentOfAccommodations"
                           :accommodations-type="data.selectedAccommodation.type_of_accommodation"
-                          v-model:content-of-accommodations-corridors="data.contentOfAccommodationsCorridors"/>
+                          v-model:content-of-accommodations-corridors="data.contentOfAccommodationsCorridors"
+                          v-model:content-of-accommodations-corridors-block="data.contentOfAccommodationsCorridorsBlock"/>
                 <CheckStep v-model:data="data"/>
+                <v-stepper-window-item
+                :value="4"
+                >
+                  <v-empty-state icon="$success">
+                    <template v-slot:media>
+                      <v-icon color="green"></v-icon>
+                    </template>
+
+                    <template v-slot:headline>
+                      <div class="text-h4">
+                        Общежитие было заполнено
+                      </div>
+                    </template>
+
+                    <template v-slot:title>
+                      <div class="text-h6">
+                        Можете переходить к распределению студентов
+                      </div>
+                    </template>
+
+                    <template v-slot:text>
+                      <div class="text-medium-emphasis text-caption">
+                       <v-btn
+                           prepend-icon="mdi-arrow-left"
+                       href="/admin"
+                       >Вернуться к админ панели</v-btn>
+                      </div>
+                    </template>
+                  </v-empty-state>
+                </v-stepper-window-item>
               </v-stepper-window>
               <v-stepper-actions
                   :disabled="disabled()"
@@ -96,6 +140,35 @@ const data = ref({
         ]
       }
     ]
+  },
+  contentOfAccommodationsCorridorsBlock: {
+    floors: [
+      {
+        gender: "М",
+        number: 1,
+        number_of_rooms: 1,
+        number_of_apartments: 1,
+        rooms: [
+          {
+            max_capacity: 1,
+            room_number: 1
+          }
+        ],
+        apartments: [
+          {
+            number: 1,
+            gender: "М",
+            number_of_rooms: 1,
+            rooms: [
+              {
+                max_capacity: 1,
+                room_number: 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 })
 
@@ -106,12 +179,6 @@ async function send() {
       ...data.value
     }
   });
-  console.log(response);
-  if (response.status === 'ok') {
-    alert('Общежитие успешно создано');
-  } else {
-    alert('Ошибка при создании общежития');
-  }
 }
 
 function isAccommodationSelected() {
@@ -132,6 +199,9 @@ function nextStep() {
   if (step.value === 3) {
     send();
     step.value++;
+    return;
+  }
+  if (step.value === 4) {
     return;
   }
   step.value++;

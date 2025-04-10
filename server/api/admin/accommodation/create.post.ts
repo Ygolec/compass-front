@@ -31,6 +31,15 @@ interface FloorCorridors {
     rooms: Room[]
 }
 
+interface FloorCorridorsBlock {
+    number: number
+    number_of_rooms: number
+    number_of_apartments: number
+    gender: string
+    rooms: Room[]
+    apartments: Apartment[]
+}
+
 
 
 interface RequestBody {
@@ -41,6 +50,9 @@ interface RequestBody {
     contentOfAccommodationsCorridors:{
         floors: FloorCorridors[]
     }
+    contentOfAccommodationsCorridorsBlock: {
+        floors: FloorCorridorsBlock[]
+    }
 }
 
 export default defineEventHandler(async (event) => {
@@ -49,7 +61,7 @@ export default defineEventHandler(async (event) => {
     const client = createDirectus(config.DIRECTUS_URL).with(staticToken(config.DIRECTUS_TOKEN)).with(rest());
     const body = await readBody<RequestBody>(event)
 
-    const {selectedAccommodation, contentOfAccommodations,contentOfAccommodationsCorridors} = body
+    const {selectedAccommodation, contentOfAccommodations,contentOfAccommodationsCorridors,contentOfAccommodationsCorridorsBlock} = body
     const {accommodation_id, address_id} = selectedAccommodation
     try {
         if (selectedAccommodation.type_of_accommodation === 'Квартирный' || selectedAccommodation.type_of_accommodation === 'Блочный') {
@@ -114,6 +126,50 @@ export default defineEventHandler(async (event) => {
                 }
             }
         }
+
+        if (selectedAccommodation.type_of_accommodation === 'Блочно-коридорный') {
+            for (const floor of contentOfAccommodationsCorridorsBlock.floors) {
+                const createdFloor = await client.request(createItem('student_accommodation_floors', {
+                    accommodation_id: accommodation_id,
+                    floor_number: floor.number,
+                    accommodation_address: address_id,
+                    gender: floor.gender
+                }));
+
+                const floorId = createdFloor.id;
+
+                // Сначала комнаты
+                for (const room of floor.rooms) {
+                    await client.request(createItem('student_accommodation_rooms', {
+                        floor_id: floorId,
+                        max_capacity: room.max_capacity,
+                        room_number: room.room_number
+                    }));
+                }
+
+                // Затем квартиры
+                for (const apartment of floor.apartments) {
+                    const createdApartmentBlock = await client.request(createItem('student_accommodation_apartments_blocks', {
+                        floor_id: floorId,
+                        number: apartment.number,
+                        gender: apartment.gender,
+                        number_of_rooms: apartment.number_of_rooms
+                    }));
+
+                    const apartmentBlockId = createdApartmentBlock.id;
+
+                    for (const room of apartment.rooms) {
+                        await client.request(createItem('student_accommodation_rooms', {
+                            floor_id: floorId,
+                            apartments_blocks_id: apartmentBlockId,
+                            max_capacity: room.max_capacity,
+                            room_number: room.room_number
+                        }));
+                    }
+                }
+            }
+        }
+
 
 
         await client.request(updateItem('student_accommodation', accommodation_id, {
