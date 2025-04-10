@@ -78,7 +78,7 @@
                     </v-list-item>
                   </template>
                 </v-select>
-                <v-card v-if="!selectedAccommodation.room_id">
+                <v-card v-if="selectedAccommodation.room_id">
                   <v-card-title>
                     Состав комнаты
                   </v-card-title>
