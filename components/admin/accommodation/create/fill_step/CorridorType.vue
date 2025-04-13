@@ -33,7 +33,7 @@
             <v-number-input
                 label="Кол-во жилых комнат"
                 :min="0"
-                :max="20"
+                :max="30"
                 v-model="floor.number_of_rooms"
             >
             </v-number-input>

@@ -40,7 +40,7 @@
             <v-number-input
                 label="Кол-во жилых квартир"
                 :min="0"
-                :max="20"
+                :max="30"
                 v-model="floor.number_of_apartments"
             >
             </v-number-input>
