@@ -89,7 +89,7 @@ const password = ref<string>('');
 const password_repeat = ref<string>('');
 const loading = ref<boolean>(false);
 const serverEmailError = ref<string>('');
-const registration_step = ref<number>(1);
+const registration_step = ref<number>(0);
 const confirm_password = password_confirm(password);
 const register = async () => {
   loading.value = true;

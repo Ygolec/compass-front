@@ -165,7 +165,7 @@
   </v-dialog>
 
   <!-- ConfirmDialog: подключаем только при необходимости -->
-  <ConfirmDialog
+  <BaseConfirmDialog
       v-if="showSubmitButton"
       :dialog="confirmDialog"
       @update:dialog="confirmDialog = $event"

@@ -7,7 +7,9 @@ import AvatarMenu from "~/components/layouts/AvatarMenu.vue";
   <v-app>
     <v-app-bar>
       <v-app-bar-title>
-        <v-btn href="/">Compass</v-btn>
+        <v-btn href="/" icon>
+          <v-icon size="35"><v-img src="/logo.svg"></v-img></v-icon>
+        </v-btn>
         <v-btn href="/relocation">Переселение</v-btn>
       </v-app-bar-title>
       <v-app-bar-nav-icon

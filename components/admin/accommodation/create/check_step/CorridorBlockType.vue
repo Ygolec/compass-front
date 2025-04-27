@@ -15,14 +15,14 @@
       </v-list-item>
 
       <v-list-group
-          v-for="(floor, floorIndex) in props.data.contentOfAccommodationsCorridors.floors"
+          v-for="(floor, floorIndex) in props.data.contentOfAccommodationsCorridorsBlock.floors"
           :key="floor.number"
           :value="floor.number"
       >
         <template #activator="{ props }">
           <VListItem
               v-bind="props"
-              :title="`Этаж ${floor.number} (комнат: ${floor.number_of_rooms})`"
+              :title="`Этаж ${floor.number} (комнат: ${floor.number_of_rooms}) (квартир: ${floor.number_of_apartments})`"
               prepend-icon="mdi-city"
           />
         </template>
@@ -33,6 +33,27 @@
             :title="`Комната №${room.room_number} (макс. чел. = ${room.max_capacity})`"
             prepend-icon="mdi-bed"
         />
+
+        <v-list-group
+            v-for="(apartment, aptIndex) in floor.apartments"
+            :key="floor.number+' '+apartment.number"
+            :value="floor.number+' '+apartment.number"
+        >
+          <template #activator="{ props }">
+            <v-list-item
+                v-bind="props"
+                :title="`Квартира №${apartment.number} (комнат: ${apartment.number_of_rooms}, пол: ${apartment.gender})`"
+                prepend-icon="mdi-home-group"
+            />
+          </template>
+
+          <v-list-item
+              v-for="(room, roomIndex) in apartment.rooms"
+              :key="floor.number+' '+apartment.number+' '+room.room_number"
+              :title="`Комната №${room.room_number} (макс. чел. = ${room.max_capacity})`"
+              prepend-icon="mdi-bed"
+          />
+        </v-list-group>
 
       </v-list-group>
     </v-list>

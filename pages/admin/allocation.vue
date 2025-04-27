@@ -99,8 +99,8 @@
                         </v-btn>
                       </v-card-actions>
                     </v-card>
-                    <v-btn class="mt-2" block>Добавить человека вручную</v-btn>
-                    <v-btn class="mt-2" block>Сформировать группу для этой комнаты</v-btn>
+                    <v-btn class="mt-2" @click="dialogOfManualInsert=true" block>Добавить человека вручную</v-btn>
+                    <v-btn class="mt-2" @click="dialog=true" block>Сформировать группу для этой комнаты</v-btn>
                   </v-card-text>
                 </v-card>
               </v-card-text>
@@ -109,10 +109,20 @@
         </v-col>
       </v-row>
     </v-container>
+    <DialogOfAutoGroup @update:dialog="dialog = $event" :dialog="dialog"
+                       v-model:room_id="selectedAccommodation.room_id"/>
+    <DialogOfManualInsert @update:dialog="dialogOfManualInsert = $event" :dialog="dialogOfManualInsert"
+                          v-model:room_id="selectedAccommodation.room_id" @update:assigned="fetchInfoAboutRoom(selectedAccommodation.room_id)"/>
   </v-main>
 </template>
 <script setup lang="ts">
+import DialogOfAutoGroup from "~/components/admin/accommodation/allocation/DialogOfAutoGroup.vue";
+import DialogOfManualInsert from "~/components/admin/accommodation/allocation/DialogOfManualInsert.vue";
+
 const acc = ref<student_accommodations_with_addresses[]>([]);
+
+const dialog = ref(true);
+const dialogOfManualInsert = ref(false);
 
 
 const selectedAccommodation = ref({

@@ -186,7 +186,7 @@ const authStore = useAuthStore();
 const relocations = ref<Relocations>({});
 const loading = ref(false);
 const error = ref<string | null>(null);
-const canDownloadFiles = ref(false);
+const canDownloadFiles = ref(true);
 
 onMounted(async () => {
   await checkUserRole();
@@ -350,7 +350,7 @@ async function generateDOCX(from: FromUser, to: ToUser, type: 'internal' | 'exte
       alignment: "center"
     }),
     new Paragraph({
-      text: type === 'internal' 
+      text: type === 'internal'
         ? `Я, ${user.fullName}, прошу переселить меня из комнаты ${roomFrom} в квартире ${apartmentFrom} в комнату ${isFrom ? to.roomTo : from.roomFrom} в квартире ${isFrom ? to.apartmentTo : from.apartmentFrom} в том же общежитии "${accommodationFrom}".`
         : `Я, ${user.fullName}, прошу переселить меня из общежития "${accommodationFrom}", расположенного по адресу ${addressFrom}, квартира ${apartmentFrom}, комната ${roomFrom}.`,
       alignment: "justify"

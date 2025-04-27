@@ -7,12 +7,14 @@
           v-if="data.selectedAccommodation.type_of_accommodation==='Квартирный' || data.selectedAccommodation.type_of_accommodation==='Блочный'"
           :data="data" :acc="acc"/>
       <CorridorType v-if="data.selectedAccommodation.type_of_accommodation==='Коридорный'" :data="data" :acc="acc"/>
+      <CorridorBlockType v-if="data.selectedAccommodation.type_of_accommodation==='Блочно-коридорный'" :data="data" :acc="acc"/>
     </v-container>
   </v-stepper-window-item>
 </template>
 <script setup lang="ts">
 import CorridorType from "~/components/admin/accommodation/create/check_step/CorridorType.vue";
 import AppartmentType from "~/components/admin/accommodation/create/check_step/AppartmentType.vue";
+import CorridorBlockType from "~/components/admin/accommodation/create/check_step/CorridorBlockType.vue";
 
 const props = defineProps<{
   data: {
@@ -37,19 +39,36 @@ const props = defineProps<{
       }[]
     },
     contentOfAccommodationsCorridors: {
-      floors: [
-        {
-          gender: "М",
-          number: 1,
-          number_of_rooms: 1,
-          rooms: [
-            {
-              max_capacity: 1,
-              room_number: 1
-            }
-          ]
-        }
-      ]
+      floors: {
+        gender: string
+        number: number
+        number_of_rooms: number
+        rooms: {
+          max_capacity: number
+          room_number: number
+        }[]
+      }[]
+    },
+    contentOfAccommodationsCorridorsBlock: {
+      floors: {
+        gender: string
+        number: number
+        number_of_rooms: number
+        number_of_apartments: number
+        apartments: {
+          number: number
+          gender: string
+          number_of_rooms: number
+          rooms: {
+            max_capacity: number
+            room_number: number
+          }[]
+        }[]
+        rooms: {
+          max_capacity: number
+          room_number: number
+        }[]
+      }[]
     }
   }
 }>();
