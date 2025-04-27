@@ -13,6 +13,7 @@ export default defineNuxtConfig({
         DIRECTUS_TOKEN: '',
         AUTH_BACKEND_URL: '',
         TELEGRAM_TOKEN: '',
+        REC_URL: '',
     },
     // runtimeConfig: {
     //     HSE_EMAIL: process.env.HSE_EMAIL,
@@ -24,6 +25,7 @@ export default defineNuxtConfig({
     //     AUTH_BACKEND_URL: process.env.AUTH_BACKEND_URL,
     //     TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN,
     //     YANDEX_API_KEY: process.env.YANDEX_API_KEY,
+    //     REC_URL: process.env.REC_URL,
     // },
     compatibilityDate: '2024-04-03',
     build: {
