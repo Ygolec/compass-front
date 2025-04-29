@@ -53,7 +53,8 @@ export default defineEventHandler(async (event) => {
             ',relocation_applications_id_to.student_accommodation_from_address_id.*' +
             ',relocation_applications_id_to.floor'+
             ',relocation_applications_id_to.user_created.first_name'+
-            ',relocation_applications_id_to.user_created.last_name'
+            ',relocation_applications_id_to.user_created.last_name' +
+            ',relocation_applications_id_to.id'
             ],
             ...(body.limit && { limit: body.itemsPerPage }),
             ...(body.page && { page: body.page }),

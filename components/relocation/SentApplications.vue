@@ -63,7 +63,7 @@
               </v-btn>
             </template>
             <v-list>
-              <v-list-item @click="open_detail(item.relocation_applications_id_from)">
+              <v-list-item @click="open_detail(item.relocation_applications_id_to.id)">
                 Просмотр заявки
               </v-list-item>
               <v-list-item @click="cancel_application_match(item.id)">
