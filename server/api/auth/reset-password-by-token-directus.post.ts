@@ -19,6 +19,8 @@ export default defineEventHandler(async (event) => {
     const decodedPayload = JSON.parse(atob(payload))
     const email = decodedPayload.email
 
+
+
     return {
         status: 200,
         body: {

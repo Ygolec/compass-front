@@ -153,7 +153,7 @@ const get_status = (status: string) => {
     case 'rejected':
       return 'Пользователь принял другую заявку или отклонил вам'
     case 'canceled':
-      return 'Вы отменили заявку'
+      return 'Заявку отменили'
     default:
       return 'Неизвестно'
   }

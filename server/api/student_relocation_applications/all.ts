@@ -33,7 +33,8 @@ export default defineEventHandler(async (event) => {
             'student_accommodation_to_address_id.*,' +
             'photos_of_room.*,student_accommodation_from_address_id.*,' +
             'student_accommodation_id_from.*,student_accommodation_id_to.*,' +
-            'user_created.first_name'],
+            'user_created.first_name,' +
+            'user_created.id'],
             ...(body.limit && {limit: body.itemsPerPage}),
             ...(body.page && {page: body.page}),
             // ...(body.sortBy && { sort: ['sort',`-${body.sortBy}`] }),

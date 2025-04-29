@@ -38,7 +38,7 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
-        setUser(user: { name: string; email: string }) {
+        setUser(user: { name: string; email: string; }) {
             this.user = user;
         },
 

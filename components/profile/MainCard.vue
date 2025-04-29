@@ -7,7 +7,7 @@
       <v-avatar
           size="150"
           color="brown">
-        KD
+        {{initials}}
       </v-avatar>
       <ContactCard/>
       <StudyCard/>
@@ -21,6 +21,10 @@ import ContactCard from "~/components/profile/ContactCard.vue";
 import StudyCard from "~/components/profile/StudyCard.vue";
 import NotificationsCard from "~/components/profile/NotificationsCard.vue";
 import LinkedAppsCard from "~/components/profile/LinkedAppsCard.vue";
+const initials = ref('NO')
+onMounted(async () => {
+  initials.value = await $fetch('/api/profile/initials')
+})
 </script>
 <style scoped>
 

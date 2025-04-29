@@ -9,6 +9,7 @@
         Рекомендации по заполнению комнаты{{ roomId }}
       </v-card-title>
       <v-card-text>
+        <v-switch label="Заполнять иностранцев?" v-model="isForeign" inset/>
         <v-card>
           <v-card-title>Рекомендованная группа</v-card-title>
           <v-card-text>
@@ -21,7 +22,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-btn
-                @click="seeQuestionnaire(recommendation.id)"
+                    @click="seeQuestionnaire(recommendation.id)"
                 >
                   Просмотреть анкету
                 </v-btn>
@@ -45,7 +46,8 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <DialogOfQuestionnaire :dialog="dialogOfQuestionnaire" v-model:questionnaire_id="questionnaire_id" @update:dialog="dialogOfQuestionnaire = $event"/>
+  <DialogOfQuestionnaire :dialog="dialogOfQuestionnaire" v-model:questionnaire_id="questionnaire_id"
+                         @update:dialog="dialogOfQuestionnaire = $event"/>
 </template>
 <script setup lang="ts">
 import DialogOfQuestionnaire from "~/components/admin/accommodation/allocation/DialogOfQuestionnaire.vue";
@@ -54,8 +56,11 @@ const props = defineProps<{
   dialog: boolean,
   room_id: number | null
 }>()
+const isForeign = ref(false)
 const questionnaire_id = ref<number | null>(null)
-const recommendations = ref<{ user_id: { first_name: string; last_name: string; study_group: string; email: string } }[]>([])
+const recommendations = ref<{
+  user_id: { first_name: string; last_name: string; study_group: string; email: string }
+}[]>([])
 const dialogOfQuestionnaire = ref(false)
 const emit = defineEmits(['update:dialog'])
 
@@ -79,7 +84,7 @@ const roomId = computed({
 
 watch(roomId, async (value) => {
   if (value != null) {
-    recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + value, {
+    recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + value + '&is_foreign=' + isForeign.value, {
       method: 'GET',
     });
   }
@@ -87,11 +92,21 @@ watch(roomId, async (value) => {
 
 watch(() => props.dialog, async (isOpen) => {
   if (isOpen && props.room_id != null) {
-    recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + props.room_id, {
+    recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + props.room_id + '&is_foreign=' + isForeign.value, {
       method: 'GET',
     });
   }
 });
+
+watch(isForeign, async (value) => {
+  if (roomId.value != null) {
+    recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + roomId.value + '&is_foreign=' + value, {
+      method: 'GET',
+    });
+  }
+}, {
+  immediate: true
+})
 </script>
 <style scoped>
 

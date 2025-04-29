@@ -1,5 +1,4 @@
 <template>
-  <create-application :dialog="create_application_dialog" @update:dialog="create_application_dialog = $event"/>
   <v-card>
     <v-card-text>
       <v-empty-state
@@ -157,6 +156,7 @@
             >
               Отменить заявку
             </v-btn>
+
             <v-btn
                 variant="flat"
                 color="blue"
@@ -184,6 +184,8 @@
       :details="details_confirm"
       @confirm="cancel_my_application"
   />
+  <create-application :dialog="create_application_dialog" @update:dialog="create_application_dialog = $event"
+                      @created="get_application"/>
 </template>
 <script setup lang="ts">
 import CreateApplication from "~/components/relocation/CreateApplication.vue";
@@ -212,10 +214,12 @@ const get_address = (address: StudentAccommodationAddresses) => {
   return parts.join(',');
 }
 
-async function cancel_my_application(){
+// TODO: Сделать редактирование заявки
+async function cancel_my_application() {
   confirm_loading.value = true
   try {
-    await $fetch(`/api/student_relocation_applications_match/create_match`, {
+    // TODO: Сделать отмену заявки
+    await $fetch(`/api/student_relocation_applications_match/`, {
       method: 'POST',
       body: student_relocation_application.value
     });
@@ -227,11 +231,19 @@ async function cancel_my_application(){
   }
 }
 
+async function get_application() {
+  try {
+    student_relocation_application.value = await $fetch<StudentRelocationApplicationDetails>(`/api/student_relocation_applications/application_by_user`, {
+      method: 'POST',
+      body: {relocation_id: route.params.id},
+    });
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 onMounted(async () => {
-  student_relocation_application.value = await $fetch<StudentRelocationApplicationDetails>(`/api/student_relocation_applications/application_by_user`, {
-    method: 'POST',
-    body: {relocation_id: route.params.id},
-  });
+  await get_application();
 });
 </script>
 <style scoped>

@@ -42,6 +42,7 @@
   </v-main>
 </template>
 <script setup lang="ts">
+
 const cards = [
   {id: 1, title: 'Заполнение общежития',text:'Наполните общежитие квартирами/комнатами для дальнейшего заселения и редактирования',href: '/admin/accommodation/create'},
   {id: 2, title: 'Распределение абитуриентов',text: 'Распределите абитуриентов по комнатам с учетом их интересов, чтобы они могли заселиться в общежитие',href: '/admin/allocation'},
@@ -65,6 +66,7 @@ function routeToCard(cardId: number) {
     return 'rounded-be-lg';
   }
 }
+
 </script>
 <style scoped>
 

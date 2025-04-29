@@ -48,13 +48,15 @@
           </v-chip>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-btn v-if="item.user_created==authStore.user?.directus_id" disabled>Моя заявка</v-btn>
+          <v-btn v-if="item.user_created.id==authStore.user?.directus_id" disabled>Моя заявка</v-btn>
           <v-btn v-else @click="open_detail(item.id)">Подробнее</v-btn>
         </template>
       </v-data-table-server>
     </v-card-text>
   </v-card>
-  <ApplicationDetail :dialog="dialog_detail" @update:dialog="dialog_detail = $event" :student_relocation_applications_id="dialog_student_relocation_applications_id" :showSubmitButton="true"/>
+  <ApplicationDetail :dialog="dialog_detail" @update:dialog="dialog_detail = $event"
+                     :student_relocation_applications_id="dialog_student_relocation_applications_id"
+                     :showSubmitButton="true"/>
 
 
 </template>
@@ -89,7 +91,7 @@ async function load_applications({page, itemsPerPage, sortBy}) {
       method: 'POST',
       body: {relocation_id: route.params.id, page, itemsPerPage, sortBy},
     });
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(error)
   } finally {
     loading.value = false

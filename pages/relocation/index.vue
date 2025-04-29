@@ -65,7 +65,7 @@ onMounted(async () => {
     item.date_start = date.format(item.date_start, 'keyboardDateTime');
     item.date_end = date.format(item.date_end, 'keyboardDateTime');
   });
-  console.log(student_relocations.value);
+  // console.log(student_relocations.value);
 });
 </script>
 

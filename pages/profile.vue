@@ -15,9 +15,6 @@
 
 import MainCard from "~/components/profile/MainCard.vue";
 
-
-
-
 </script>
 <style scoped>
 

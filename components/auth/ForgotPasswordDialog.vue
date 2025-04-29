@@ -81,7 +81,7 @@ const update_dialog = (value: boolean) => {
 const reset_password = async () => {
   loading.value = true;
   try {
-    await $fetch('/api/password-reset/request-to-reset-by-directus', {
+    await $fetch('/api/auth/request-to-reset-by-directus', {
       method: 'POST',
       body: {
         email: email.value,

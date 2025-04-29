@@ -63,7 +63,7 @@
               </v-btn>
             </template>
             <v-list>
-              <v-list-item @click="">
+              <v-list-item @click="open_detail(item.relocation_applications_id_from)">
                 Просмотр заявки
               </v-list-item>
               <v-list-item @click="cancel_application_match(item.id)">
@@ -75,9 +75,11 @@
       </v-data-table-server>
     </v-card-text>
   </v-card>
+  <ApplicationDetail :dialog="dialog_detail" @update:dialog="dialog_detail = $event" :student_relocation_applications_id="dialog_student_relocation_applications_id" :showSubmitButton="false"/>
 </template>
 <script setup lang="ts">
 import {useAuthStore} from "~/stores/auth_store";
+import ApplicationDetail from "~/components/relocation/ApplicationDetail.vue";
 
 const authStore = useAuthStore();
 const student_relocation_applications_match = ref()
@@ -95,6 +97,8 @@ const headers = ref([
   {title: 'Действия', key: 'actions', align: "center"},
 ])
 const items_length = ref(0)
+const dialog_detail = ref(false)
+const dialog_student_relocation_applications_id = ref(0)
 
 async function load_applications({page, itemsPerPage, sortBy}) {
   loading.value = true
@@ -135,6 +139,11 @@ const get_status = (status: string) => {
     default:
       return 'Неизвестно'
   }
+}
+
+function open_detail(student_relocation_applications_id: number) {
+  dialog_student_relocation_applications_id.value = student_relocation_applications_id
+  dialog_detail.value = true
 }
 
 async function cancel_application_match(id: number) {

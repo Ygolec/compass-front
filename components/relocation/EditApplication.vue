@@ -144,7 +144,7 @@
     </v-card>
   </v-dialog>
   <!-- Ваш компонент уведомлений -->
-  <Snackbar
+  <BaseSnackbar
       @update:snackbar="snackbar = $event"
       :snackbar="snackbar"
       :details="snackbar_details"

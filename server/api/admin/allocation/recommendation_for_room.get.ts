@@ -3,7 +3,7 @@ import {createDirectus, readItems, rest, staticToken} from "@directus/sdk";
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     const client = createDirectus(config.DIRECTUS_URL).with(staticToken(config.DIRECTUS_TOKEN)).with(rest());
-    const {room_id} = getQuery(event)
+    const {room_id, is_foreign} = getQuery(event)
 
     if (!room_id) {
         return {error: 'room_id are required'}
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
         const room = await client.request<Room[]>(
             readItems('student_accommodation_rooms', {
-                fields: ['id', 'max_capacity'],
+                fields: ['id', 'max_capacity','floor_id.gender', 'apartments_blocks_id.gender'],
                 filter: {id: {_eq: room_id}},
                 limit: 1,
             })
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
         }
 
         const maxCapacity = room[0].max_capacity
-
+        const gender = room[0].floor_id?.gender || room[0].apartments_blocks_id?.gender;
         const today = new Date().toISOString().split('T')[0]
 
         const occupations = await client.request<Occupation[]>(
@@ -77,8 +77,8 @@ export default defineEventHandler(async (event) => {
         const recommendation = await $fetch(`${config.REC_URL}/recommend`, {
             method: 'POST',
             body: {
-                "gender":"Male",
-                "foreigner":true,
+                "gender": gender === 'М' ? 'Male' : gender === 'Ж' ? 'Female' : gender,
+                "foreigner": is_foreign,
                 "available_places": availablePlaces,
                 "max_capacity": maxCapacity,
                 "questionnaires_ids": residents.map(resident => resident.anketa_id).filter(id => id !== null),

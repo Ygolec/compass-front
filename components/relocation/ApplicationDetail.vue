@@ -174,7 +174,7 @@
   />
 
   <!-- Snackbar: тоже опционально -->
-  <Snackbar
+  <BaseSnackbar
       v-if="showSubmitButton"
       @update:snackbar="snackbar = $event"
       :snackbar="snackbar"
@@ -263,6 +263,15 @@ async function sendApplication() {
     if (error.response?._data?.message === 'User already have application') {
       snackbarDetails.value = {
         text: 'Вы уже отправили заявку, отмените её, чтобы создать новую',
+        timeout: 5000,
+        color: 'red',
+        button_close_color: 'black'
+      }
+      snackbar.value = true
+    }
+    if (error.response?._data?.message === 'User have no application') {
+      snackbarDetails.value = {
+        text: 'У вас нет заявки на переселение, создайте её',
         timeout: 5000,
         color: 'red',
         button_close_color: 'black'

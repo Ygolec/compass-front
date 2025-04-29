@@ -83,7 +83,8 @@
                     Состав комнаты
                   </v-card-title>
                   <v-card-text>
-                    <v-card v-for="resident in roomsInfo.residents">
+                    <v-card v-for="resident in roomsInfo.residents"
+                            class="mb-5">
                       <v-card-title>
                         {{ resident.firstname }} {{ resident.lastname }}
                       </v-card-title>
@@ -112,7 +113,8 @@
     <DialogOfAutoGroup @update:dialog="dialog = $event" :dialog="dialog"
                        v-model:room_id="selectedAccommodation.room_id"/>
     <DialogOfManualInsert @update:dialog="dialogOfManualInsert = $event" :dialog="dialogOfManualInsert"
-                          v-model:room_id="selectedAccommodation.room_id" @update:assigned="fetchInfoAboutRoom(selectedAccommodation.room_id)"/>
+                          v-model:room_id="selectedAccommodation.room_id"
+                          @update:assigned="fetchInfoAboutRoom(selectedAccommodation.room_id)"/>
   </v-main>
 </template>
 <script setup lang="ts">
@@ -121,7 +123,7 @@ import DialogOfManualInsert from "~/components/admin/accommodation/allocation/Di
 
 const acc = ref<student_accommodations_with_addresses[]>([]);
 
-const dialog = ref(true);
+const dialog = ref(false);
 const dialogOfManualInsert = ref(false);
 
 
@@ -198,6 +200,33 @@ watch(
       roomsInfo.value = [];
     }
 );
+
+watch(
+    () => selectedAccommodation.value.address_id,
+    () => {
+
+    }
+)
+
+watch(
+    () => selectedAccommodation.value.floor_id,
+    () => {
+      selectedAccommodation.value.apartment_id = null;
+      selectedAccommodation.value.room_id = null;
+      apartments.value = [];
+      rooms.value = [];
+      roomsInfo.value = [];
+    }
+)
+
+watch(
+    () => selectedAccommodation.value.apartment_id,
+    () => {
+      selectedAccommodation.value.room_id = null;
+      rooms.value = [];
+      roomsInfo.value = [];
+    }
+)
 
 watch(
     () => selectedAccommodation.value.floor_id,

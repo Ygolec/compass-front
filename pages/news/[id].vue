@@ -5,14 +5,12 @@
         <v-col cols="12">
           <v-sheet rounded="lg">
             <v-card
-
             >
               <v-card-title class="text-h6">
                 {{ news?.title }}
               </v-card-title>
               <v-card-text>
                 <v-card-text v-html="news?.description">
-
                 </v-card-text>
               </v-card-text>
             </v-card>

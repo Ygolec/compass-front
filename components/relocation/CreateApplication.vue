@@ -121,7 +121,7 @@
       </v-form>
     </v-card>
   </v-dialog>
-  <Snackbar @update:snackbar="snackbar = $event" :snackbar="snackbar" :details="snackbar_details"/>
+  <BaseSnackbar @update:snackbar="snackbar = $event" :snackbar="snackbar" :details="snackbar_details"/>
 </template>
 <script setup lang="ts">
 import {
@@ -168,7 +168,7 @@ const serverEmailError = ref<string>('');
 const props = defineProps({
   dialog: Boolean,
 });
-const emit = defineEmits(["update:dialog"]);
+const emit = defineEmits(["update:dialog", "created"]);
 
 const update_dialog = (value: boolean) => {
   emit('update:dialog', value);
@@ -247,6 +247,7 @@ async function create_application() {
     }
   }
   update_dialog(false);
+  emit("created");
 }
 
 onMounted(async () => {

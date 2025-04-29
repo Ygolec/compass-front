@@ -7,10 +7,11 @@
   >
     <template v-slot:activator="{ props }">
       <v-avatar
-          color="surface-variant"
+          color="#031545"
           size="50"
           v-bind="props"
       >
+        <v-icon>mdi-account</v-icon>
       </v-avatar>
     </template>
 
@@ -21,6 +22,7 @@
         <template v-if="!user">
           <v-list-item>
             <v-btn
+                variant="outlined"
                 href="/login"
                 block
             >
@@ -36,11 +38,15 @@
           </v-list-item>
           <v-divider></v-divider>
           <v-list-item>
-            <v-btn block href="/profile">Профиль</v-btn>
+            <v-btn variant="plain" block href="/profile">Профиль</v-btn>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item v-if="isAdmin">
+            <v-btn variant="plain" block href="/admin">Администрирование</v-btn>
           </v-list-item>
           <v-divider></v-divider>
           <v-list-item>
-            <v-btn block @click="logout">Выйти</v-btn>
+            <v-btn variant="plain" block @click="logout">Выйти</v-btn>
           </v-list-item>
         </template>
       </v-list>
@@ -53,6 +59,7 @@ import {useAuthStore} from "~/stores/auth_store";
 const config = useRuntimeConfig();
 const menu = ref<boolean>(false);
 const authStore = useAuthStore();
+const isAdmin = ref(false)
 
 const user = computed(() => {
   return authStore.user;
@@ -62,6 +69,14 @@ async function logout() {
   await authStore.logout()
 }
 
+onMounted(async () => {
+  const response = await $fetch('/api/auth/check-admin');
+  if (response.status = 'success') {
+    isAdmin.value = true
+  } else {
+    isAdmin.value = false
+  }
+})
 </script>
 
 <style scoped>
