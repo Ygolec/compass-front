@@ -22,6 +22,16 @@ interface DirectusRole {
       </v-card-actions>
     </v-card>
 
+    <v-card v-else class="mb-4">
+      <v-card-text>
+        <v-empty-state
+            icon="mdi-magnify"
+            text="Нет данных для отображения"
+            title="Нет данных">
+        </v-empty-state>
+      </v-card-text>
+    </v-card>
+
     <v-progress-circular
       v-if="loading"
       indeterminate
@@ -138,9 +148,9 @@ interface DirectusRole {
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Document, Packer, Paragraph } from 'docx';
-import { saveAs } from 'file-saver';
+import { Document, Packer, Paragraph, AlignmentType, HeadingLevel } from 'docx';
 import { useAuthStore } from '~/stores/auth_store';
+import {saveAs} from "file-saver";
 
 interface Address {
   city: string;
@@ -346,14 +356,14 @@ async function generateDOCX(from: FromUser, to: ToUser, type: 'internal' | 'exte
   const paragraphs = [
     new Paragraph({
       text: "Заявление на переселение",
-      heading: "Heading1",
-      alignment: "center"
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
     }),
     new Paragraph({
       text: type === 'internal'
         ? `Я, ${user.fullName}, прошу переселить меня из комнаты ${roomFrom} в квартире ${apartmentFrom} в комнату ${isFrom ? to.roomTo : from.roomFrom} в квартире ${isFrom ? to.apartmentTo : from.apartmentFrom} в том же общежитии "${accommodationFrom}".`
         : `Я, ${user.fullName}, прошу переселить меня из общежития "${accommodationFrom}", расположенного по адресу ${addressFrom}, квартира ${apartmentFrom}, комната ${roomFrom}.`,
-      alignment: "justify"
+      alignment: AlignmentType.JUSTIFIED,
     }),
     new Paragraph({ text: " " }),
     new Paragraph({ text: "Данные о студенте:", heading: "Heading2" }),
@@ -445,7 +455,7 @@ async function downloadGroupDOCX(groupName: string) {
         text: type === 'internal'
           ? `Я, ${from.fullName}, прошу переселить меня из комнаты ${from.roomFrom} в квартире ${from.apartmentFrom} в комнату ${to.roomTo} в квартире ${to.apartmentTo} в том же общежитии "${from.accommodationFrom}".`
           : `Я, ${from.fullName}, прошу переселить меня из общежития "${from.accommodationFrom}", расположенного по адресу ${from.addressFrom}, квартира ${from.apartmentFrom}, комната ${from.roomFrom}, в общежитие "${to.accommodationTo}", расположенное по адресу ${to.addressTo}, квартира ${to.apartmentTo}, комната ${to.roomTo}.`,
-        alignment: "justify"
+        alignment: AlignmentType.JUSTIFIED,
       }),
       new Paragraph("------------------------------------------------------------"),
       new Paragraph(" "),

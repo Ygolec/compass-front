@@ -30,7 +30,9 @@
             </v-card>
           </v-card-text>
           <v-card-actions>
-            <v-btn>
+            <v-btn
+            @click="fillRoom()"
+            >
               Заполнить
             </v-btn>
           </v-card-actions>
@@ -62,7 +64,7 @@ const recommendations = ref<{
   user_id: { first_name: string; last_name: string; study_group: string; email: string }
 }[]>([])
 const dialogOfQuestionnaire = ref(false)
-const emit = defineEmits(['update:dialog'])
+const emit = defineEmits(['update:dialog','filled'])
 
 
 function seeQuestionnaire(id: number) {
@@ -80,7 +82,19 @@ const roomId = computed({
     emit('update:dialog', val)
   }
 })
-
+async function fillRoom() {
+  if (recommendations.value.length){
+    await $fetch('/api/admin/allocation/fill-room-by-recommendation', {
+      method: 'POST',
+      body: {
+        room_id: roomId.value,
+        recommendations: recommendations.value,
+      }
+    })
+    emit('filled')
+    emit('update:dialog', false)
+  }
+}
 
 watch(roomId, async (value) => {
   if (value != null) {

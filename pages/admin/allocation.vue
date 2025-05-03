@@ -3,6 +3,18 @@
     <v-container>
       <v-row>
         <v-col cols="12">
+          <v-breadcrumbs>
+            <v-breadcrumbs-item
+                href="/admin"
+                title="Панель администрирования"
+            />
+            <v-breadcrumbs-divider/>
+            <v-breadcrumbs-item
+                href="/admin/allocation"
+                title="Распределение по общежитиям"
+                :disabled="true"
+            />
+          </v-breadcrumbs>
           <v-sheet rounded="lg">
             <v-card>
               <v-card-title>
@@ -92,16 +104,22 @@
                         Группа: {{ resident.study_group }}, Начало проживания: {{ resident.start_date }}
                       </v-card-text>
                       <v-card-actions>
-                        <v-btn>
+                        <v-btn
+                        @click="handleSwap(resident)"
+                        >
                           Заменить
                         </v-btn>
-                        <v-btn>
+                        <v-btn
+                            @click="unlinkRoom(resident.firstname + ' ' + resident.lastname,resident.user_id)"
+                        >
                           Отвязать
                         </v-btn>
                       </v-card-actions>
                     </v-card>
                     <v-btn class="mt-2" @click="dialogOfManualInsert=true" block>Добавить человека вручную</v-btn>
-                    <v-btn class="mt-2" @click="dialog=true" block>Сформировать группу для этой комнаты</v-btn>
+                    <v-btn class="mt-2" @click="dialog=true" :disabled="roomsInfo.available_places === 0" block>
+                      Сформировать группу для этой комнаты
+                    </v-btn>
                   </v-card-text>
                 </v-card>
               </v-card-text>
@@ -111,22 +129,36 @@
       </v-row>
     </v-container>
     <DialogOfAutoGroup @update:dialog="dialog = $event" :dialog="dialog"
-                       v-model:room_id="selectedAccommodation.room_id"/>
+                       v-model:room_id="selectedAccommodation.room_id"
+                       @filled="fetchInfoAboutRoom(selectedAccommodation.room_id)"/>
     <DialogOfManualInsert @update:dialog="dialogOfManualInsert = $event" :dialog="dialogOfManualInsert"
                           v-model:room_id="selectedAccommodation.room_id"
                           @update:assigned="fetchInfoAboutRoom(selectedAccommodation.room_id)"/>
+    <ConfirmDialog :dialog="confirm_dialog" :details="confirm_dialog_dialog_details"
+                   @confirm="handleConfirm" @update:dialog="confirm_dialog = $event"/>
+    <DialogOfSwap :dialog="dialogOfSwap" @update:dialog="dialogOfSwap = $event" :resident="residentForSwap" :room_id="selectedAccommodation.room_id" @update:swapped="fetchInfoAboutRoom(selectedAccommodation.room_id)"/>
   </v-main>
 </template>
 <script setup lang="ts">
 import DialogOfAutoGroup from "~/components/admin/accommodation/allocation/DialogOfAutoGroup.vue";
 import DialogOfManualInsert from "~/components/admin/accommodation/allocation/DialogOfManualInsert.vue";
+import ConfirmDialog from "~/components/base/ConfirmDialog.vue";
+import DialogOfSwap from "~/components/admin/accommodation/allocation/DialogOfSwap.vue";
 
 const acc = ref<student_accommodations_with_addresses[]>([]);
 
 const dialog = ref(false);
+const dialogOfSwap = ref(false);
+const residentForSwap = ref(null)
 const dialogOfManualInsert = ref(false);
-
-
+const confirm_dialog_dialog_details = ref({
+  title: 'Отвязать человека от комнаты',
+  text: 'Вы уверены, что хотите отвязать человека от комнаты?',
+  button_confirm_text: 'Подтвердить',
+  button_confirm_color: 'red',
+});
+const idForUnlink = ref('');
+const confirm_dialog = ref(false);
 const selectedAccommodation = ref({
   accommodation_id: null,
   address_id: null,
@@ -164,6 +196,37 @@ const fetchDataFromServer = async (accommodationId: string, addressId: string) =
   }
 };
 
+function unlinkRoom(name: string, id: string) {
+  idForUnlink.value = '';
+  confirm_dialog_dialog_details.value.text = 'Вы уверены, что хотите отвязать человека от комнаты?' + ` (${name})`;
+  confirm_dialog_dialog_details.value.button_confirm_text = 'Подтвердить';
+  confirm_dialog_dialog_details.value.button_confirm_color = 'red';
+  confirm_dialog.value = true;
+  idForUnlink.value = id;
+}
+
+async function handleConfirm() {
+  if (idForUnlink.value) {
+    await $fetch('/api/admin/allocation/unlink-user-by-id', {
+      method: 'POST',
+      body: {
+        user_id: idForUnlink.value,
+      }
+    }).then(() => {
+      fetchInfoAboutRoom(selectedAccommodation.value.room_id);
+    }).catch((error) => {
+      console.error('Ошибка при получении данных с сервера:', error);
+    })
+  }
+  confirm_dialog.value = false;
+}
+
+async function handleSwap(resident) {
+  if (resident) {
+    residentForSwap.value = resident;
+    dialogOfSwap.value = true;
+  }
+}
 
 const fetchApartments = async (floor_id: string) => {
   try {
