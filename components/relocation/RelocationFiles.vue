@@ -150,7 +150,9 @@ interface DirectusRole {
 import { ref, onMounted } from 'vue';
 import { Document, Packer, Paragraph, AlignmentType, HeadingLevel } from 'docx';
 import { useAuthStore } from '~/stores/auth_store';
-import {saveAs} from "file-saver";
+import pkg from 'file-saver';
+const { saveAs } = pkg;
+
 
 interface Address {
   city: string;
