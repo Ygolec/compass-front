@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
                         }
                     },
                     {
-                        '_or': [
+                        '_and': [
                             {
                                 status: {
                                     '_neq': 'canceled'
@@ -114,7 +114,7 @@ export default defineEventHandler(async (event) => {
                         ],
                     },
                     {
-                        '_or': [
+                        '_and': [
                             {
                                 status: {
                                     '_neq': 'canceled'

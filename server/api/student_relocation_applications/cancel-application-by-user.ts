@@ -1,4 +1,10 @@
-import {createDirectus, readItem, readItems, readUser, rest, staticToken} from "@directus/sdk";
+import {
+    createDirectus,
+    readItems,
+    rest,
+    staticToken,
+    updateItem, updateItems,
+} from "@directus/sdk";
 
 
 export default defineEventHandler(async (event) => {
@@ -23,7 +29,7 @@ export default defineEventHandler(async (event) => {
     try {
         const student_relocation_applications = await client.request(readItems('student_relocation_applications', {
             fields: ['id'],
-            filter:{
+            filter: {
                 '_and': [
                     {
                         user_created: {
@@ -40,6 +46,11 @@ export default defineEventHandler(async (event) => {
                             '_neq': 'canceled'
                         }
                     },
+                    {
+                        status: {
+                            '_neq': 'rejected'
+                        }
+                    },
                 ]
             }
         }))
@@ -53,37 +64,24 @@ export default defineEventHandler(async (event) => {
 
         const student_relocation_application_id: string = student_relocation_applications[0].id;
 
-        const result = await client.request(readItem('student_relocation_applications',student_relocation_application_id, {
-            fields: ['*' +
-            ',student_accommodation_id_from.*' +
-            ',student_accommodation_id_to.*' +
-            ',student_accommodation_from_address_id.*' +
-            ',student_accommodation_to_address_id.*' +
-            ',photos_of_room.*'
-            ],
+        const result = await client.request(updateItem('student_relocation_applications', student_relocation_application_id, {
+            status: 'canceled',
+        }))
+
+        const matchesForApplication = await client.request(readItems('student_relocation_applications_match', {
+            fields: ['id'],
             filter: {
-                "_and": [
-                    {
-                        status: {
-                            '_neq': 'rejected'
-                        }
-                    },
-                    {
-                        status: {
-                            '_neq': 'canceled'
-                        }
-                    }
-                ]
+                "relocation_applications_id_to": {
+                    "_eq": student_relocation_application_id
+                }
             }
         }))
 
-        const user2 = await client.request(readUser(result.user_created, {
-            fields:['id','first_name','last_name','email']
+        const cancelledMatches = await client.request(updateItems('student_relocation_applications_match', matchesForApplication.map(match => match.id), {
+            status: 'canceled',
         }))
 
-        result.user_created = user2
-
-        return result;
+        return {status: 'success'}
 
     } catch (error: any) {
         console.error('Ошибка получения данных:', error);

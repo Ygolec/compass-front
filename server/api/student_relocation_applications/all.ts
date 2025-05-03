@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
                 student_relocation_id: {
                     _eq: body.relocation_id
                 },
-                '_or': [
+                '_and': [
                     {
                         status: {
                             '_neq': 'canceled'
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
                 student_relocation_id: {
                     _eq: body.relocation_id
                 },
-                '_or': [
+                '_and': [
                     {
                         status: {
                             '_neq': 'canceled'

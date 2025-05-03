@@ -160,6 +160,7 @@
             <v-btn
                 variant="flat"
                 color="blue"
+                @click="edit_dialog=true"
             >
               Отредактировать заявку
             </v-btn>
@@ -186,16 +187,20 @@
   />
   <create-application :dialog="create_application_dialog" @update:dialog="create_application_dialog = $event"
                       @created="get_application"/>
+  <EditApplication :dialog="edit_dialog" @update:dialog="edit_dialog = $event" @edited="get_application()"
+  />
 </template>
 <script setup lang="ts">
 import CreateApplication from "~/components/relocation/CreateApplication.vue";
 import {useAuthStore} from "~/stores/auth_store";
 import ConfirmDialog from "~/components/base/ConfirmDialog.vue";
+import EditApplication from "~/components/relocation/EditApplication.vue";
 
+const edit_dialog = ref(false);
 const confirm_dialog = ref(false)
 const details_confirm = ref({
   title: 'Отменить заявку',
-  text: `Вы уверены что хотите удалить переселение?`,
+  text: `Вы уверены, что хотите удалить заявку на переселение?`,
   button_confirm_text: 'удалить',
   button_confirm_color: 'red'
 })
@@ -219,7 +224,7 @@ async function cancel_my_application() {
   confirm_loading.value = true
   try {
     // TODO: Сделать отмену заявки
-    await $fetch(`/api/student_relocation_applications_match/`, {
+    await $fetch(`/api/student_relocation_applications/cancel-application-by-user`, {
       method: 'POST',
       body: student_relocation_application.value
     });

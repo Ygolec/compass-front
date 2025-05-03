@@ -1,11 +1,11 @@
 import {
     createDirectus, createFolder,
-    createItem, createItems,
+    createItem, createItems, deleteFiles, readFiles,
     readFolder,
     readFolders,
     readItems,
     rest,
-    staticToken, updateItem,
+    staticToken, updateItem, updateItems,
     uploadFiles
 } from "@directus/sdk";
 
@@ -79,35 +79,24 @@ export default defineEventHandler(async (event) => {
         const student_relocation_applications = await client.request(
             readItems('student_relocation_applications', {
                 filter: {
-                    student_relocation_id: studentApplication.student_relocation_id,
+                    id: studentApplication.id,
                     user_created: user.directus_id,
-                    '_and': [
-                        {
-                            status: {
-                                '_neq': 'canceled'
-                            },
-                        },
-                    ],
+                    status: {
+                        _in: ['canceled', 'rejected', 'ended']
+                    }
                 }
             })
         )
         if (student_relocation_applications.length) {
             throw createError({
                 statusCode: 400,
-                message: 'Application exists',
+                message: 'Application cant be edited',
             })
         }
     }
 
     const student_relocation_application = await client.request(
-        createItem('student_relocation_applications', {
-            status: 'created',
-            user_created: user.directus_id,
-            student_relocation_id: studentApplication.student_relocation_id,
-            student_accommodation_id_from: studentApplication.accommodation_from.id,
-            student_accommodation_from_address_id: studentApplication.accommodation_from.id_address,
-            student_accommodation_id_to: studentApplication.accommodation_to.id,
-            student_accommodation_to_address_id: studentApplication.accommodation_to.id_address,
+        updateItem('student_relocation_applications', studentApplication.id, {
             floor: studentApplication.floor,
             apartment_number: studentApplication.apartment_number,
             room_number: studentApplication.room_number,
@@ -152,9 +141,29 @@ export default defineEventHandler(async (event) => {
         }
     } else {
         if (photos.length && folder.length) {
+            const readFolder = await client.request(readFiles({
+                filter: {
+                    folder: {
+                        _eq: folder[0].id
+                    }
+                }
+            }))
+            if (readFolder.length) {
+                await client.request(deleteFiles(readFolder.map((photo: any) => photo.id.toString())))
+            }
+            // const clearPhotoStudentRelocation = await client.request(updateItems('student_relocation_applications', {
+            //     filter: {
+            //         student_relocation_applications_id: {
+            //             _eq: student_relocation_application.id
+            //         }
+            //     }
+            // }, {
+            //     student_relocation_applications_id: student_relocation_application.id,
+            //     directus_files_id: null
+            // }))
             const formData = new FormData();
             for (let i = 0; i < photos.length; i++) {
-                formData.append('folder', folder.id);
+                formData.append('folder', folder[0].id);
                 formData.append('uploaded_by', user.directus_id);
                 formData.append('file', new Blob([photos[i].data], {type: photos[i].type}), photos[i].filename);
             }

@@ -6,129 +6,107 @@
     <v-card>
       <v-form @submit.prevent="handle_submit">
         <v-card-title>Редактирование заявки на переселение</v-card-title>
-        <v-card-text>
+        <v-card-text v-if="student_relocation_application">
           <v-row>
             <v-col>
-              <!-- Из какого общежития (заблокирован) -->
-              <v-select
-                  label="Из какого общежития"
-                  :items="accommodations"
-                  :item-title="item => item.name"
-                  :item-value="item => item.id"
-                  v-model="student_application.accommodation_from.id"
-                  disabled
+              <v-select label="Из какого общежития"
+                        :items="accommodations"
+                        :item-title="item => item.name"
+                        :item-value="item => item.id"
+                        v-model="student_relocation_application.student_accommodation_id_from.id"
+                        readonly
+                        disabled
+                        :rules="[required]"
               >
               </v-select>
             </v-col>
             <v-col>
-              <!-- В какое общежитие (заблокирован) -->
-              <v-select
-                  label="В какое общежитие"
-                  :items="accommodations"
-                  :item-title="item => item.name"
-                  :item-value="item => item.id"
-                  v-model="student_application.accommodation_to.id"
-                  disabled
+              <v-select label="В какое общежитие"
+                        :items="accommodations"
+                        :item-title="item => item.name"
+                        :item-value="item => item.id"
+                        v-model="student_relocation_application.student_accommodation_id_to.id"
+                        readonly
+                        disabled
+                        :rules="[required]"
               >
               </v-select>
             </v-col>
           </v-row>
           <v-row>
             <v-col>
-              <!-- Адрес нынешнего общежития (заблокирован) -->
-              <v-select
-                  label="Адрес нынешнего общежития"
-                  :items="getAccommodationAddress(student_application.accommodation_from.id)"
-                  :item-value="item => item.id"
-                  :item-title="item => `${item.city}, ${item.street}, ${item.building_number}`"
-                  v-model="student_application.accommodation_from.id_address"
-                  disabled
+              <v-select label="Адрес нынешнего общежития"
+                        :items="getAccommodationAddress(student_relocation_application.student_accommodation_from_address_id.id)"
+                        :item-value="item => item.id"
+                        :item-title="item => `${item.city}, ${item.street}, ${item.building_number}`"
+                        v-model="student_relocation_application.student_accommodation_from_address_id.id"
+                        readonly
+                        disabled
+                        :rules="[required]"
               >
               </v-select>
             </v-col>
             <v-col>
-              <!-- Адрес общежития переселения (заблокирован) -->
-              <v-select
-                  label="Адрес общежития переселения"
-                  :items="getAccommodationAddress(student_application.accommodation_to.id)"
-                  :item-value="item => item.id"
-                  :item-title="item => `${item.city}, ${item.street}, ${item.building_number}`"
-                  v-model="student_application.accommodation_to.id_address"
-                  disabled
+              <v-select label="Адрес общежития переселения"
+                        :items="getAccommodationAddress(student_relocation_application.student_accommodation_to_address_id.id)"
+                        :item-value="item => item.id"
+                        :item-title="item => `${item.city}, ${item.street}, ${item.building_number}`"
+                        v-model="student_relocation_application.student_accommodation_to_address_id.id"
+                        readonly
+                        disabled
+                        :rules="[required]"
               >
               </v-select>
             </v-col>
           </v-row>
-
-          <!-- Остальные поля редактируемые -->
-          <v-number-input
-              label="Этаж"
-              control-variant="hidden"
-              :min="1"
-              :max="25"
-              v-model="student_application.floor"
-              :rules="[required]"
+          <v-number-input label="Этаж"
+                          control-variant="hidden"
+                          :min="1"
+                          :max="25"
+                          v-model="student_relocation_application.floor"
+                          :rules="[required]"
           ></v-number-input>
-
-          <v-number-input
-              label="Номер квартиры"
-              control-variant="hidden"
-              v-model="student_application.apartment_number"
-          ></v-number-input>
-
-          <v-number-input
-              label="Номер комнаты"
-              control-variant="hidden"
-              v-model="student_application.room_number"
-              :rules="[required]"
-          ></v-number-input>
-
-          <v-number-input
-              label="Кол-во проживающих в комнате"
-              control-variant="hidden"
-              :min="1"
-              :max="4"
-              type="number"
-              v-model="student_application.occupancy"
-              :rules="[required]"
-          ></v-number-input>
-
-          <v-text-field
-              label="Телеграм"
-              :rules="[telegram_tag_check]"
-              v-model="student_application.telegram"
-              clearable
-              @input="
-              student_application.telegram =
-                '@' + student_application.telegram.replace(/^@/, '')
-            "
-              hint="Нужен для связи с вами другими студентами"
+          <v-text-field label="Номер квартиры"
+                        control-variant="hidden"
+                        v-model="student_relocation_application.apartment_number"
           ></v-text-field>
-
-          <v-text-field
-              label="Номер телефона"
-              hint="Информация, только для администрации"
-              clearable
-              :rules="[required, phone_russian_check]"
-              v-model="student_application.phone_number"
-              @input="
-              student_application.phone_number =
-                '+7' + student_application.phone_number.replace(/^\+7/, '')
-            "
+          <v-text-field label="Номер комнаты"
+                        control-variant="hidden"
+                        v-model="student_relocation_application.room_number"
+                        :rules="[required]"
           ></v-text-field>
-
-          <!-- При необходимости меняем или добавляем новые фото -->
+          <v-number-input label="Кол-во проживающих в комнате"
+                          control-variant="hidden"
+                          :min="1"
+                          :max="4"
+                          type="number"
+                          v-model="student_relocation_application.occupancy"
+                          :rules="[required]"
+          ></v-number-input>
+          <v-text-field label="Телеграмм"
+                        :rules="[telegram_tag_check]"
+                        v-model="student_relocation_application.telegram"
+                        clearable
+                        @input="student_relocation_application.telegram = '@' + student_relocation_application.telegram.replace(/^@/, '')"
+                        hint="Нужен для связи с вами другими студентами"
+          ></v-text-field>
+          <v-text-field label="Номер телефона"
+                        hint="Информация, только для администрации"
+                        clearable
+                        :rules="[required,phone_russian_check]"
+                        v-model="student_relocation_application.phone_number"
+                        @input="student_relocation_application.phone_number = '+7' + student_relocation_application.phone_number.replace(/^\+7/, '')"
+          ></v-text-field>
           <v-container>
             <v-file-upload
-                title="Загрузите фотографии комнаты (при необходимости)"
+                title="Загрузите фотографии комнаты"
                 density="compact"
-                v-model="photos"
-                multiple
+                v-model="files"
                 clearable
+                multiple
             >
             </v-file-upload>
           </v-container>
-
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn @click="update_dialog(false)">Отмена</v-btn>
@@ -137,176 +115,115 @@
               color="green"
               variant="flat"
           >
-            Сохранить изменения
+            Отредактировать заявку
           </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
   </v-dialog>
-  <!-- Ваш компонент уведомлений -->
-  <BaseSnackbar
-      @update:snackbar="snackbar = $event"
-      :snackbar="snackbar"
-      :details="snackbar_details"
-  />
+
 </template>
 
 <script setup lang="ts">
-import {
-  phone_russian_check,
-  required,
-  telegram_tag_check
-} from "~/utils/rules";
-import Snackbar from "~/components/base/Snackbar.vue";
-
-// Типизация, заменить на актуальные
-interface student_accommodations_with_addresses {
-  id: number;
-  name: string;
-  addresses: {
-    id: number;
-    city: string;
-    street: string;
-    building_number: string;
-  }[];
-}
-
-interface student_application {
-  id?: number;
-  accommodation_from: {
-    id: number|null;
-    id_address: number|null;
-  };
-  accommodation_to: {
-    id: number|null;
-    id_address: number|null;
-  };
-  floor: number|null;
-  apartment_number: number|null;
-  room_number: number|null;
-  occupancy: number|null;
-  telegram: string|null;
-  phone_number: string|null;
-  student_relocation_id?: number|null;
-}
-
-// Локальные стэйты
-const snackbar_details = ref<{
-  text: string,
-  color: string,
-  timeout: number,
-  button_close_color: string
-}>({
-  text: '',
-  color: '',
-  timeout: 5000,
-  button_close_color: 'green'
-});
-const snackbar = ref(false);
-
-const accommodations = ref<student_accommodations_with_addresses[]>([]);
-
-// Исходные данные вашей заявки (заполняются при запросе)
-const student_application = ref<student_application>({
-  accommodation_from: { id: null, id_address: null },
-  accommodation_to: { id: null, id_address: null },
-  floor: null,
-  apartment_number: null,
-  room_number: null,
-  occupancy: null,
-  telegram: null,
-  phone_number: null,
-});
-
-// Если нужны фотографии
-const photos = shallowRef<File[] | null>(null);
+import {phone_russian_check, required, telegram_tag_check} from "~/utils/rules";
 
 const props = defineProps({
   dialog: Boolean,
-  applicationId: {
-    type: Number,
-    required: true,
-  }
 });
-const emit = defineEmits(["update:dialog"]);
+const files = shallowRef<File[] | null>(null)
+const student_relocation_application = ref<StudentRelocationApplicationDetails>()
+const route = useRoute()
+const emit = defineEmits(["update:dialog", "edited"]);
+const accommodations = ref<student_accommodations_with_addresses[]>([])
+const serverEmailError = ref<string>('');
 
 const update_dialog = (value: boolean) => {
   emit('update:dialog', value);
 };
 
-const getAccommodationAddress = (id: number | null) => {
-  return accommodations.value.find(acc => acc.id === id)?.addresses || [];
-};
-
-const handle_submit = async () => {
-  // Валидация основных полей
-  if (required(student_application.value.floor) !== true) return;
-  if (required(student_application.value.room_number) !== true) return;
-  if (required(student_application.value.occupancy) !== true) return;
-
-  // Проверка телеграма (если заполнен)
-  if (student_application.value.telegram) {
-    if (telegram_tag_check(student_application.value.telegram) !== true) return;
-  }
-
-  // Проверка телефона
-  if (required(student_application.value.phone_number) !== true) return;
-  if (phone_russian_check(student_application.value.phone_number!) !== true) return;
-
-  await update_application();
-};
-
-async function update_application() {
+async function get_application() {
   try {
-    const formData = new FormData();
-
-    // Добавляем фото, если есть
-    if (photos.value) {
-      photos.value.forEach((photo: File) => {
-        formData.append("photos", photo);
-      });
-    }
-
-    // Данные заявки в JSON
-    formData.append("student_application", JSON.stringify(student_application.value));
-
-    // Вызовите ваш API для обновления (пример эндпоинта)
-    await $fetch(`/api/student_relocation_applications/update_application/${props.applicationId}`, {
-      method: "POST", // или PUT, в зависимости от реализации бэка
-      body: formData,
+    student_relocation_application.value = await $fetch<StudentRelocationApplicationDetails>(`/api/student_relocation_applications/application_by_user`, {
+      method: 'POST',
+      body: {relocation_id: route.params.id},
     });
-
-    // Закрытие модального окна
-    update_dialog(false);
-  } catch (error: any) {
-    // Ловим ошибку и показываем уведомление
-    console.error(error);
-
-    snackbar_details.value = {
-      text: error?.response?._data?.message || "Ошибка при сохранении заявки",
-      color: 'red',
-      timeout: 5000,
-      button_close_color: 'black'
-    };
-    snackbar.value = true;
+    await fetchImagesFromDirectus(student_relocation_application.value.photos_of_room)
+  } catch (error) {
+    console.error(error)
   }
 }
 
-onMounted(async () => {
-  // Подгружаем список общаг
-  accommodations.value = await $fetch<student_accommodations_with_addresses[]>(
-      '/api/student_accommodation/list_of_accommodation'
-  );
+async function fetchImagesFromDirectus(photos: { directus_files_id: string }[]) {
+  const downloadedFiles = await Promise.all(
+      photos.map(async (photo, index) => {
+        const url = `https://directus.hse-compass.ru/assets/${photo.directus_files_id}`
+        const res = await fetch(url)
+        const blob = await res.blob()
+        return new File([blob], `room_photo_${index}.jpg`, {type: blob.type})
+      })
+  )
 
-  // Загружаем данные заявки по ID
-  // Предполагается, что ваш бэк может отдать заявку по её идентификатору
-  const existing_application = await $fetch<student_application>(
-      `/api/student_relocation_applications/application/${props.applicationId}`
-  );
+  files.value = downloadedFiles
+}
+const getAccommodationAddress = (id: string | null) => {
+  return accommodations.value.find(acc => acc.id === id)?.addresses || [];
+};
+const handle_submit = () => {
+  serverEmailError.value = '';
+  if (!student_relocation_application.value)
+    return;
 
-  // Заполняем форму
-  student_application.value = existing_application;
-});
+  if (required(student_relocation_application.value.floor) !== true)
+    return;
+
+  if (required(student_relocation_application.value.room_number) !== true)
+    return;
+
+  if (required(student_relocation_application.value.occupancy) !== true)
+    return;
+
+  if (student_relocation_application.value.telegram !== null)
+    if (telegram_tag_check(student_relocation_application.value.telegram) !== true)
+      return;
+
+  if (required(student_relocation_application.value.phone_number) !== true)
+    return;
+
+  if (student_relocation_application.value.phone_number !== null)
+    if (phone_russian_check(student_relocation_application.value.phone_number) !== true)
+      return;
+
+  edit_application()
+};
+
+async function edit_application() {
+  const formData = new FormData()
+  if (files.value != null) {
+    files.value.forEach((photo: File) => {
+      formData.append('photos', photo)
+    })
+  }
+  formData.append('student_application', JSON.stringify(student_relocation_application.value));
+  try {
+    await $fetch('/api/student_relocation_applications/edit-application', {
+      method: 'POST',
+      body: formData,
+    });
+  } catch (error: any) {
+    console.error(error);
+  }
+  update_dialog(false);
+  emit("edited");
+}
+
+watch(() => props.dialog, async (newVal) => {
+  if (newVal) {
+    await get_application()
+    accommodations.value = await $fetch<student_accommodations_with_addresses[]>('/api/student_accommodation/list_of_accommodation');
+  } else {
+    files.value = null
+  }
+}, {immediate: true})
 </script>
 
 <style scoped>

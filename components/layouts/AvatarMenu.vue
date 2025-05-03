@@ -69,14 +69,21 @@ async function logout() {
   await authStore.logout()
 }
 
-onMounted(async () => {
-  const response = await $fetch('/api/auth/check-admin');
-  if (response.status = 'success') {
-    isAdmin.value = true
-  } else {
-    isAdmin.value = false
+watch(user, async () => {
+  if (!user.value) {
+    isAdmin.value = false;
+    return
   }
-})
+  const response = await $fetch('/api/auth/check-admin');
+  if (response.status === 'success') {
+    isAdmin.value = true;
+  } else {
+    isAdmin.value = false;
+  }
+}, { immediate: true }
+);
+
+
 </script>
 
 <style scoped>

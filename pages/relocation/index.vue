@@ -39,6 +39,9 @@
 
 <script setup lang="ts">
 import {useDate} from 'vuetify'
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+dayjs.locale('ru');
 
 const student_relocations = ref<student_relocation[]>([]);
 const date = useDate();
@@ -62,8 +65,8 @@ const getStatusColor = (status: string) => {
 onMounted(async () => {
   student_relocations.value = await $fetch<student_relocation[]>('/api/relocation/list_of_relocations');
   student_relocations.value.forEach((item) => {
-    item.date_start = date.format(item.date_start, 'keyboardDateTime');
-    item.date_end = date.format(item.date_end, 'keyboardDateTime');
+    item.date_start = dayjs(item.date_start).format('DD.MM.YYYY HH:mm');
+    item.date_end = dayjs(item.date_end).format('DD.MM.YYYY HH:mm');
   });
   // console.log(student_relocations.value);
 });

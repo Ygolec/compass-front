@@ -17,6 +17,8 @@
           item-value="id"
           @update:options="load_applications"
           loading-text="Загрузка... Пожалуйста подождите"
+          no-data-text="Нет данных для отображения"
+          items-per-page-text="Объектов на странице"
       >
         <template v-slot:top>
           <v-toolbar
