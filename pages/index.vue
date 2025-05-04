@@ -6,7 +6,8 @@
       <v-divider :thickness="20" opacity="0"/>
       <News/>
     </v-container>
-    <v-container>
+    <v-container
+    >
       <Map/>
     </v-container>
   </v-main>

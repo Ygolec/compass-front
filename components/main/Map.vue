@@ -1,11 +1,10 @@
 <template>
-
   <yandex-map
       v-model="map"
       :settings="{
         location: {
           center: [37.617644, 55.755819],
-          zoom: 9,
+          zoom: 11,
         },
       }"
       width="100%"

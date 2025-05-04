@@ -6,23 +6,35 @@ export default defineEventHandler(async (event) => {
 
     try {
         const accommodations = await client.request(readItems('student_accommodation', {
-            fields: ['*' +
-            ',type.*'],
-            filter: {
-                status: {
-                    _eq: 'not_fill'
-                }
-            }
-        }))
+            fields: ['*', 'type.*']
+        }));
+
         const accommodations_addresses = await client.request(readItems('student_accommodation_addresses', {
             fields: ['*'],
-        }))
-        const accommodations_with_addresses = accommodations.map(accommodation => {
-            return {
-                ...accommodation,
-                addresses: accommodation.addresses.map(addressId => accommodations_addresses.find(address => address.id === addressId))
-            };
-        });
+            filter: {
+                status: {
+                    _eq: 'not_filled'
+                }
+            }
+        }));
+
+        const accommodations_with_addresses = accommodations
+            .map(accommodation => {
+                const addresses = accommodation.addresses.map(addressId =>
+                    accommodations_addresses.find(address => address.id === addressId)
+                ).filter(Boolean);
+
+                if (addresses.length > 0) {
+                    return {
+                        ...accommodation,
+                        addresses
+                    };
+                }
+
+                return null;
+            })
+            .filter(Boolean);
+
         return accommodations_with_addresses;
 
     } catch (error: any) {

@@ -172,7 +172,7 @@ export default defineEventHandler(async (event) => {
 
 
 
-        await client.request(updateItem('student_accommodation', accommodation_id, {
+        await client.request(updateItem('student_accommodation_addresses', address_id, {
             status: 'fill_ended'
         }))
 
