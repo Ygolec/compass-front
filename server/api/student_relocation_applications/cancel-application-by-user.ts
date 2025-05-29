@@ -62,6 +62,13 @@ export default defineEventHandler(async (event) => {
             })
         }
 
+        if (student_relocation_applications[0].status==='ended'){
+            throw createError({
+                statusCode: 400,
+                message: 'Application already ended',
+            })
+        }
+
         const student_relocation_application_id: string = student_relocation_applications[0].id;
 
         const result = await client.request(updateItem('student_relocation_applications', student_relocation_application_id, {
