@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         const student_relocation_applications = await client.request(readItems('student_relocation_applications', {
-            fields: ['id'],
+            fields: ['id','status'],
             filter: {
                 '_and': [
                     {
