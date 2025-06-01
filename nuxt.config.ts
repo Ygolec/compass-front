@@ -14,8 +14,9 @@ export default defineNuxtConfig({
         AUTH_BACKEND_URL: '',
         TELEGRAM_TOKEN: '',
         DIRECTUS_PASSWORD_RESET_URL: '',
+        REC_URL: '',
         public:{
-            REC_URL: '',
+            RAG_URL: '',
         },
     },
     // runtimeConfig: {
