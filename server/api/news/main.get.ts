@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const headers = getHeaders(event)
 
     const news = await client.request(readItems('news', {
-        fields: ['id','title','date_created','sort'],
+        fields: ['id','title','date_created','sort','main_image'],
         filter: {
             "_and": [
                 {

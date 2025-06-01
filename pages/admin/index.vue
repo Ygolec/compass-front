@@ -47,6 +47,7 @@ const cards = [
   {id: 1, title: 'Заполнение общежития',text:'Наполните общежитие квартирами/комнатами для дальнейшего заселения и редактирования',href: '/admin/accommodation/create'},
   {id: 2, title: 'Распределение абитуриентов',text: 'Распределите абитуриентов по комнатам с учетом их интересов, чтобы они могли заселиться в общежитие',href: '/admin/allocation'},
   {id: 3, title: 'Выгрузка документов',text: 'Выгрузите документы для различных целей, таких как отчетность или предоставление информации',href: '/admin/relocation-files'},
+  {id: 4, title: 'Умный поиск',text: 'Задайте ваш вопрос по локальным документам и получите ответ с ссылками на документы',href: '/admin/smart-search'},
 ];
 
 function routeToCard(cardId: number) {
@@ -57,7 +58,7 @@ function routeToCard(cardId: number) {
     return 'rounded-te-lg';
   }
   if (cardId%4===3){
-    return 'rounded-bs-lg rounded-be-lg';
+    return 'rounded-bs-lg';
   }
   if (cardId % cards.length === cards.length-1) {
     return 'rounded-bs-lg';

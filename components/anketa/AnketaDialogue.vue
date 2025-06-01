@@ -216,7 +216,7 @@ onMounted(async () => {
     // Проверяем, что пользователь авторизован
     await authStore.fetchCurrentUser();
     // console.log('Роль пользователя при заполнении анкеты:', authStore.user?.role);
-    console.log('Текущий пользователь:', authStore.user);
+    // console.log('Текущий пользователь:', authStore.user);
   } catch (e: any) {
     error.value = e.message || 'Ошибка при проверке авторизации';
   } finally {

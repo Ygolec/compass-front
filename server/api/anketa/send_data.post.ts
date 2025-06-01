@@ -11,7 +11,15 @@ const MAX_DATA_SIZE = 1024 * 1024; // 1MB
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
-    
+    const headers = getHeaders(event)
+
+    if (!headers) {
+        throw createError({
+            statusCode: 400,
+            message: 'No data',
+        })
+    }
+
     if (!config.DIRECTUS_URL) {
         throw createError({
             message: 'DIRECTUS_URL не настроен',
@@ -24,6 +32,18 @@ export default defineEventHandler(async (event) => {
             message: 'DIRECTUS_TOKEN не настроен',
             status: 500
         });
+    }
+    const user: user = await $fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+        headers: headers as HeadersInit
+    });
+
+    if (!user) {
+        throw createError({
+            statusCode: 401,
+            message: 'Unauthorized',
+        })
     }
 
     const anketa_data: AnketaData = await readBody(event);
@@ -48,7 +68,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         const existing_email = await client.request(withToken(config.DIRECTUS_TOKEN,
-            readItems("Anketa_data", {
+            readItems("questionnaires", {
                 filter: { email_edu: { _eq: anketa_data.email } },
                 limit: 1
             })
@@ -61,7 +81,8 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        const create_anketa = await client.request(withToken(config.DIRECTUS_TOKEN, createItem("Anketa_data", {
+        const create_anketa = await client.request(withToken(config.DIRECTUS_TOKEN, createItem("questionnaires", {
+            user_id: user.directus_id,
             lastname: anketa_data.lastName,
             firstname: anketa_data.firstName,
             middlename: anketa_data.middleName,

@@ -5,6 +5,9 @@
         <v-col cols="12">
           <v-sheet rounded="lg">
             <v-card>
+              <v-card-title class="text-h5">
+                Новости
+              </v-card-title>
               <v-data-iterator
               :items="news"
               >
@@ -18,7 +21,7 @@
                           md="4"
                       >
                         <v-card class="pb-3" border flat>
-                          <v-img :src="item.raw.img"></v-img>
+                          <v-img src="https://directus.hse-compass.ru/assets/${item.raw.main_image}"></v-img>
 
                           <v-list-item :subtitle="item.raw.subtitle" class="mb-2">
                             <template v-slot:title>
@@ -36,7 +39,8 @@
                             <v-btn
                                 class="text-none"
                                 size="small"
-                                text="Read"
+                                :href="`/news/${item.raw.id}`"
+                                text="Прочитать"
                                 variant="flat"
                                 border
                             >

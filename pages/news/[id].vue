@@ -3,6 +3,19 @@
     <v-container>
       <v-row>
         <v-col cols="12">
+          <v-breadcrumbs>
+            <v-breadcrumbs-item
+                href="/news"
+                title="Новости"
+            />
+            <v-breadcrumbs-divider/>
+            <v-breadcrumbs-item
+                v-if="news?.title"
+                href=""
+                :title="news?.title"
+                :disabled="true"
+            />
+          </v-breadcrumbs>
           <v-sheet rounded="lg">
             <v-card
             >
