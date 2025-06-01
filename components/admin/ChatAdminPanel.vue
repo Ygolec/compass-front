@@ -62,7 +62,7 @@ async function sendMessage() {
   await nextTick();
   scrollToBottom();
   try {
-    const res = await fetch(`${config.RAG_URL}/ask`, {
+    const res = await fetch(`${config.public.RAG_URL}/ask`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ "question": userInput, "directory":'work_documents'})
@@ -72,7 +72,7 @@ async function sendMessage() {
     if (data.answer)
       data.source_documents = data.source_documents.map((doc: any) => ({
         ...doc,
-        url: `${config.RAG_URL}/download/work_documents/${doc.source}`,
+        url: `${config.public.RAG_URL}/download/work_documents/${doc.source}`,
       }));
 
     messages.value.push({
