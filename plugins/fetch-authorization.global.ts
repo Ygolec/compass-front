@@ -19,13 +19,14 @@ export default defineNuxtPlugin(() => {
             return await _fetch(request, options);
         } catch (error: any) {
             const isUnauthorized = error?.response?.status === 401;
+            const isNotFound  = error?.response?.status === 404;
 
             // Добавляем защиту от бесконечного цикла
             const isRefreshRequest = typeof request === 'string'
                 ? request.includes('/api/auth/refresh')
                 : false;
 
-            if (!authStore.access_token || !isUnauthorized || isRefreshRequest) {
+            if (!authStore.access_token || (!isUnauthorized && !isNotFound)|| isRefreshRequest) {
                 throw error;
             }
 
