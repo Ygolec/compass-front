@@ -75,12 +75,12 @@ export default defineEventHandler(async (event) => {
         const availablePlaces = maxCapacity - occupiedCount
         let url;
         if (variant === 1) {
-            url = config.REC_URL2
+            url = config.REC_URL2+ '/recommentations'
         } else {
-            url = config.REC_URL
+            url = config.REC_URL+ '/recommend'
         }
 
-        const recommendation = await $fetch(`${url}/recommend`, {
+        const recommendation = await $fetch(`${url}`, {
             method: 'POST',
             body: {
                 "gender": gender === 'М' ? 'Male' : gender === 'Ж' ? 'Female' : gender,
