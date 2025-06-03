@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
         const availablePlaces = maxCapacity - occupiedCount
         let url;
         if (variant === 1) {
-            url = config.REC_URL2+ '/recommentations'
+            url = config.REC_URL2+ '/recommendations'
         } else {
             url = config.REC_URL+ '/recommend'
         }
