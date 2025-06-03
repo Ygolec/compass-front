@@ -3,7 +3,8 @@ import {createDirectus, readItems, rest, staticToken} from "@directus/sdk";
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     const client = createDirectus(config.DIRECTUS_URL).with(staticToken(config.DIRECTUS_TOKEN)).with(rest());
-    const {room_id, is_foreign, variant} = getQuery(event)
+    const {room_id, is_foreign, variant: variantStr} = getQuery(event)
+    const variant = parseInt(variantStr as string, 10);
 
     if (!room_id) {
         return {error: 'room_id are required'}
