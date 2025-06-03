@@ -6,32 +6,50 @@
   >
     <v-card>
       <v-card-title>
-        Рекомендации по заполнению комнаты{{ roomId }}
+        Рекомендации по заполнению комнаты
       </v-card-title>
       <v-card-text>
         <v-switch label="Заполнять иностранцев?" v-model="isForeign" inset/>
+        <p>Вариант рекомендации</p>
+        <v-btn-toggle
+            v-model="toggle"
+            divided
+            class="mb-3"
+        >
+          <v-btn >Вариант 1</v-btn>
+          <v-btn >Вариант 2</v-btn>
+        </v-btn-toggle>
         <v-card>
           <v-card-title>Рекомендованная группа</v-card-title>
           <v-card-text>
-            <v-card v-for="recommendation in recommendations" class="mb-2">
-              <v-card-title>
-                {{ recommendation.user_id.first_name }} {{ recommendation.user_id.last_name }}
-              </v-card-title>
-              <v-card-text>
-                Группа: {{ recommendation.user_id.study_group }}, Почта: {{ recommendation.user_id.email }}
-              </v-card-text>
-              <v-card-actions>
-                <v-btn
-                    @click="seeQuestionnaire(recommendation.id)"
-                >
-                  Просмотреть анкету
-                </v-btn>
-              </v-card-actions>
-            </v-card>
+            <v-progress-linear
+                v-if="loading"
+                indeterminate
+                color="primary"
+                class="mb-3"
+            ></v-progress-linear>
+
+            <div v-else>
+              <v-card v-for="recommendation in recommendations" class="mb-2">
+                <v-card-title>
+                  {{ recommendation.user_id.first_name }} {{ recommendation.user_id.last_name }}
+                </v-card-title>
+                <v-card-text>
+                  Группа: {{ recommendation.user_id.study_group }}, Почта: {{ recommendation.user_id.email }}
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn
+                      @click="seeQuestionnaire(recommendation.id)"
+                  >
+                    Просмотреть анкету
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </div>
           </v-card-text>
           <v-card-actions>
             <v-btn
-            @click="fillRoom()"
+                @click="fillRoom()"
             >
               Заполнить
             </v-btn>
@@ -54,6 +72,7 @@
 <script setup lang="ts">
 import DialogOfQuestionnaire from "~/components/admin/accommodation/allocation/DialogOfQuestionnaire.vue";
 
+const toggle = ref(0);
 const props = defineProps<{
   dialog: boolean,
   room_id: number | null
@@ -64,6 +83,7 @@ const recommendations = ref<{
   user_id: { first_name: string; last_name: string; study_group: string; email: string }
 }[]>([])
 const dialogOfQuestionnaire = ref(false)
+const loading = ref(false)
 const emit = defineEmits(['update:dialog','filled'])
 
 
@@ -82,6 +102,22 @@ const roomId = computed({
     emit('update:dialog', val)
   }
 })
+
+async function getRecommendations() {
+  if (roomId.value != null) {
+    loading.value = true
+    try {
+      recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + roomId.value + '&is_foreign=' + isForeign.value + '&variant=' + toggle.value, {
+        method: 'GET',
+      });
+    } catch (error) {
+      console.error('Ошибка при получении рекомендаций:', error);
+    } finally {
+      loading.value = false
+    }
+  }
+}
+
 async function fillRoom() {
   if (recommendations.value.length){
     await $fetch('/api/admin/allocation/fill-room-by-recommendation', {
@@ -98,25 +134,27 @@ async function fillRoom() {
 
 watch(roomId, async (value) => {
   if (value != null) {
-    recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + value + '&is_foreign=' + isForeign.value, {
-      method: 'GET',
-    });
+    await getRecommendations()
   }
 }, {immediate: true})
 
 watch(() => props.dialog, async (isOpen) => {
   if (isOpen && props.room_id != null) {
-    recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + props.room_id + '&is_foreign=' + isForeign.value, {
-      method: 'GET',
-    });
+    await getRecommendations()
   }
 });
 
-watch(isForeign, async (value) => {
+watch(isForeign, async () => {
   if (roomId.value != null) {
-    recommendations.value = await $fetch('/api/admin/allocation/recommendation_for_room?room_id=' + roomId.value + '&is_foreign=' + value, {
-      method: 'GET',
-    });
+    await getRecommendations()
+  }
+}, {
+  immediate: true
+})
+
+watch(toggle, async () => {
+  if (roomId.value != null) {
+    await getRecommendations()
   }
 }, {
   immediate: true

@@ -3,7 +3,7 @@ import {createDirectus, readItems, rest, staticToken} from "@directus/sdk";
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     const client = createDirectus(config.DIRECTUS_URL).with(staticToken(config.DIRECTUS_TOKEN)).with(rest());
-    const {room_id, is_foreign} = getQuery(event)
+    const {room_id, is_foreign, variant} = getQuery(event)
 
     if (!room_id) {
         return {error: 'room_id are required'}
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
         const room = await client.request<Room[]>(
             readItems('student_accommodation_rooms', {
-                fields: ['id', 'max_capacity','floor_id.gender', 'apartments_blocks_id.gender'],
+                fields: ['id', 'max_capacity', 'floor_id.gender', 'apartments_blocks_id.gender'],
                 filter: {id: {_eq: room_id}},
                 limit: 1,
             })
@@ -73,8 +73,14 @@ export default defineEventHandler(async (event) => {
 
         const occupiedCount = residents.length
         const availablePlaces = maxCapacity - occupiedCount
+        let url;
+        if (variant === 1) {
+            url = config.REC_URL2
+        } else {
+            url = config.REC_URL
+        }
 
-        const recommendation = await $fetch(`${config.REC_URL}/recommend`, {
+        const recommendation = await $fetch(`${url}/recommend`, {
             method: 'POST',
             body: {
                 "gender": gender === 'М' ? 'Male' : gender === 'Ж' ? 'Female' : gender,
