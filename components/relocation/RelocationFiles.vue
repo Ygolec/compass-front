@@ -201,8 +201,8 @@ const error = ref<string | null>(null);
 const canDownloadFiles = ref(true);
 
 onMounted(async () => {
-  await checkUserRole();
-  fetchRelocations();
+  // await checkUserRole();
+  await fetchRelocations();
 });
 
 async function checkUserRole() {
@@ -292,7 +292,7 @@ async function fetchRelocations() {
         console.warn('Пропущена запись со статусом отличным от approved:', item);
         return acc;
       }
-
+      console.log(item)
       const groupName = item.relocation_applications_id_to.student_relocation_id.name;
       const from = {
         fullName: `${item.relocation_applications_id_from?.user_created?.first_name || ''} ${item.relocation_applications_id_from?.user_created?.last_name || ''}`.trim(),
@@ -310,8 +310,8 @@ async function fetchRelocations() {
         email: item.relocation_applications_id_to?.user_created?.email || 'Не указан',
         phone: item.relocation_applications_id_to?.user_created?.phone_number || 'Не указан',
         telegram: item.relocation_applications_id_to?.user_created?.telegram || 'Не указан',
-        accommodationTo: item.relocation_applications_id_to?.student_accommodation_id_to?.name || 'Не указано',
-        addressTo: formatAddress(item.relocation_applications_id_to?.student_accommodation_to_address_id),
+        accommodationTo: item.relocation_applications_id_to?.student_accommodation_id_from?.name || 'Не указано',
+        addressTo: formatAddress(item.relocation_applications_id_from?.student_accommodation_to_address_id),
         apartmentTo: item.relocation_applications_id_to?.apartment_number || 'Не указан',
         roomTo: item.relocation_applications_id_to?.room_number || 'Не указан',
       };
