@@ -1,10 +1,39 @@
-# Nuxt Minimal Starter
+# HSE-Compass
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Сервис для работы с общежитиями
 
-## Setup
+HSE-Compass - это веб-приложение, разработанное для упрощения взаимодействия студентов с системой общежитий Высшей Школы Экономики.
 
-Make sure to install dependencies:
+### Описание проекта
+
+HSE-Compass предоставляет единую платформу для решения различных задач, связанных с проживанием в общежитиях ВШЭ:
+- Просмотр новостей и объявлений
+- Интерактивная карта расположения общежитий
+- Управление личным профилем
+- Заполнение необходимых анкет и форм
+- Функционал для переселения
+- Административная панель для управления системой
+- Функционал распределения студентов на основе анкет и предпочтений
+
+### Технологии
+
+Проект разработан с использованием современного стека технологий:
+- **Frontend**: Vue.js 3 с фреймворком Nuxt 3
+- **UI**: Vuetify 3 для стильного и отзывчивого интерфейса
+- **Управление состоянием**: Pinia
+- **База данных**: Prisma ORM для работы с API Вышки, Directus+PSQL для всех основных
+- **Карты**: Интеграция с Яндекс.Картами
+- **Аутентификация**: Сервис авторизации на JWT,Поддержка входа через Telegram
+- **CMS**: Интеграция с Directus
+- **Документы**: Генерация документов с помощью docx
+
+### Установка и запуск
+
+#### Требования
+- Node.js (рекомендуется последняя стабильная версия)
+- Bun, npm, pnpm или yarn
+
+#### Установка зависимостей
 
 ```bash
 # npm
@@ -20,9 +49,7 @@ yarn install
 bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+#### Запуск сервера разработки
 
 ```bash
 # npm
@@ -38,9 +65,9 @@ yarn dev
 bun run dev
 ```
 
-## Production
+Приложение будет доступно по адресу `http://127.0.0.1:80`
 
-Build the application for production:
+#### Сборка для продакшена
 
 ```bash
 # npm
@@ -56,7 +83,7 @@ yarn build
 bun run build
 ```
 
-Locally preview production build:
+#### Локальный предпросмотр продакшен-сборки
 
 ```bash
 # npm
@@ -72,4 +99,31 @@ yarn preview
 bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### Конфигурация
+
+Для работы приложения необходимо настроить следующие переменные окружения:
+- `HSE_EMAIL` - Email для отправки уведомлений
+- `HSE_EMAIL_PASSWORD` - Пароль от email
+- `DATABASE_URL` - URL подключения к базе данных
+- `DIRECTUS_URL` - URL Directus CMS
+- `DIRECTUS_TOKEN` - Токен доступа к Directus
+- `AUTH_BACKEND_URL` - URL сервера аутентификации
+- `TELEGRAM_TOKEN` - Токен Telegram для аутентификации
+
+### Структура проекта
+
+- `/components` - Vue компоненты
+- `/layouts` - Шаблоны страниц
+- `/middleware` - Промежуточное ПО Nuxt
+- `/pages` - Страницы приложения
+- `/plugins` - Плагины Nuxt
+- `/prisma` - Схемы и миграции Prisma
+- `/public` - Статические файлы
+- `/server` - Серверная логика
+- `/stores` - Хранилища Pinia
+- `/types` - TypeScript типы
+- `/utils` - Вспомогательные функции
+
+### Контейнеризация
+
+Проект поддерживает контейнеризацию с Docker. Для сборки и запуска контейнера используйте Dockerfile в корне проекта.
